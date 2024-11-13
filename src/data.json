@@ -1,0 +1,34 @@
+{
+  "type_info_filters": [
+    {
+      "id_type_info": 1,
+      "name": "NF Instance ID",
+      "code": "nfInstanceId"
+    },
+    {
+      "id_filter": 2,
+      "name": "NF Type",
+      "code": "nfType"
+    }
+  ],
+  "analysis_metrics": [
+    {
+      "id_metric": 1,
+      "name": "Nf Load",
+      "code": "NF_LOAD",
+      "disabled": false
+    },
+    {
+      "id_metric": 2,
+      "name": "Service Experience",
+      "code": "SERVICE_EXPERIENCE",
+      "disabled": true
+    },
+    {
+      "id_metric": 3,
+      "name": "Load Level Information",
+      "code": "LOAD_LEVEL_INFORMATION",
+      "disabled": false
+    }
+  ]
+}
