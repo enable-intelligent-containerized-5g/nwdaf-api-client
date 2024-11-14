@@ -1,14 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnalysisMetric, Options } from "../models/api";
-import data from "../data.json";
-
-const { analysis_metrics } = data as { analysis_metrics: AnalysisMetric[] };
+import { typedData } from "../global.d";
 
 export const useAnalisysMetric = () => {
+  const { analysis_metrics } = typedData;
   const [analysisMetrics, setAnalysisMetrics] = useState<AnalysisMetric[]>([]);
-  const [options, setOptions] = useState<Options[]>([]);
+  const [optionsAnalysisMetrics, setOptionsAnalysisMetrics] = useState<
+    Options[]
+  >([]);
 
   useEffect(() => {
     setAnalysisMetrics(analysis_metrics);
-  });
+  }, [analysis_metrics]);
+
+  useEffect(() => {
+    const analysisMetricsOptions = analysisMetrics.map((analysisMetric) => ({
+      label: analysisMetric.name,
+      value: analysisMetric.code,
+      disabled: analysisMetric.disabled,
+    }));
+    setOptionsAnalysisMetrics(analysisMetricsOptions);
+  }, [analysisMetrics]);
+
+  return {
+    optionsAnalysisMetrics,
+  };
 };

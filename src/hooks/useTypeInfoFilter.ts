@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import { Options, TypeInfoFilter } from "../models/api";
-import data from "../data.json";
-
-const { type_info_filters } = data;
+import { typedData } from "../global.d";
 
 export const useTypeInfoFilter = () => {
+  const { type_info_filters } = typedData;
   const [typeInfoFilters, setTypeInfoFilters] = useState<TypeInfoFilter[]>([]);
-  const [options, setOptions] = useState<Options[]>([]);
+  const [optionsTypeInfoFilters, setOptionsTypeInfoFilters] = useState<
+    Options[]
+  >([]);
 
   useEffect(() => {
     setTypeInfoFilters(type_info_filters);
-    load();
   }, [type_info_filters]);
 
-  const load = () => {
+  useEffect(() => {
     const typeInfoFiltersOptions = typeInfoFilters.map((typeInfoFilter) => ({
       label: typeInfoFilter.name,
       value: typeInfoFilter.code,
     }));
-    setOptions(typeInfoFiltersOptions);
-  };
+    setOptionsTypeInfoFilters(typeInfoFiltersOptions);
+  }, [typeInfoFilters]);
 
   return {
-    options,
+    optionsTypeInfoFilters,
   };
 };
