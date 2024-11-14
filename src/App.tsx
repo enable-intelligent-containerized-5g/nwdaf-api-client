@@ -33,8 +33,8 @@ const schema = yup.object().shape({
   nfInstances: yup.array().of(yup.string()).notRequired(),
   analysisTime: yup.string().required("This field is required"),
   defaultTime: yup.number().required("This field is required"),
-  startTime: yup.string().required("This field is required"),
-  endTime: yup.string().required("This field is required"),
+  startTime: yup.string(),
+  endTime: yup.string(),
   accuracy: yup.string().required("This field is required"),
 });
 
@@ -67,10 +67,27 @@ const App: React.FC = () => {
     typeInfoFilter,
     nfTypes,
     nfInstances,
-    startTime,
-    endTime,
+    analysisTime,
+    defaultTime,
     accuracy,
   }: AnalysisMetricsForm) => {
+    let startTime = "";
+    let endTime = "";
+    const currentTime = new Date();
+    const pastTime = new Date(currentTime.getTime() - defaultTime * 60000);
+
+    const valueTimeFormatted = pastTime.toISOString();
+
+    const currentTimeFormatted = currentTime.toISOString();
+
+    if (analysisTime === "statistic") {
+      startTime = valueTimeFormatted;
+      endTime = currentTimeFormatted;
+    } else {
+      startTime = currentTimeFormatted;
+      endTime = valueTimeFormatted;
+    }
+
     const analysisInfoRequestData: AnalysisInfoRequestData = {
       eventId: analysisMetrics,
       startTime,
@@ -295,29 +312,6 @@ const App: React.FC = () => {
                           render={({ field }) => {
                             const handleChange = (e) => {
                               const value = e.target.value;
-                              const currentTime = new Date();
-                              const pastTime = new Date(
-                                currentTime.getTime() - value * 60000,
-                              );
-
-                              const analysisTime = getValues("analysisTime");
-
-                              const valueTimeFormatted = pastTime
-                                .toISOString()
-                                .replace("Z", "-5:00");
-
-                              const currentTimeFormatted = currentTime
-                                .toISOString()
-                                .replace("Z", "-5:00");
-
-                              if (analysisTime === "statistic") {
-                                setValue("startTime", valueTimeFormatted);
-                                setValue("endTime", currentTimeFormatted);
-                              } else {
-                                setValue("startTime", currentTimeFormatted);
-                                setValue("endTime", valueTimeFormatted);
-                              }
-
                               field.onChange(value);
                             };
 
