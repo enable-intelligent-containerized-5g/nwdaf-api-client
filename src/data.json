@@ -30,5 +30,72 @@
       "code": "LOAD_LEVEL_INFORMATION",
       "disabled": false
     }
+  ],
+  "nf_types": [
+    "AMF",
+    "AUSF",
+    "NSSF",
+    "NWDAF-ANLF",
+    "NWDAF-MTLF",
+    "PCF",
+    "SMF",
+    "UDM",
+    "UDR"
+  ],
+  "analysis_times": [
+    {
+      "id_analysis_time": 1,
+      "name": "Statistic",
+      "code": "statistic"
+    },
+    {
+      "id_analysis_time": 2,
+      "name": "Prediction",
+      "code": "prediction"
+    }
+  ],
+  "default_times": [
+    {
+      "id_default_time": 1,
+      "name": "1m",
+      "code": 1
+    },
+    {
+      "id_default_time": 2,
+      "name": "2m",
+      "code": 2
+    },
+    {
+      "id_default_time": 3,
+      "name": "3m",
+      "code": 3
+    },
+    {
+      "id_default_time": 4,
+      "name": "4m",
+      "code": 4
+    },
+    {
+      "id_default_time": 5,
+      "name": "5m",
+      "code": 5
+    }
+  ],
+  "accuracy_levels": [
+    {
+      "id_accuracy_level": 1,
+      "name": "Low",
+      "code": "LOW"
+    },
+    {
+      "id_accuracy_level": 2,
+      "name": "Medium",
+      "code": "MEDIUM"
+    },
+    {
+      "id_accuracy_level": 3,
+      "name": "High",
+      "code": "HIGH"
+    }
   ]
 }
