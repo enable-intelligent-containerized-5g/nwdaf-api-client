@@ -1,4 +1,7 @@
-import { AnalysisInfoRequestData } from "../../models/api";
+import {
+  AnalysisInfoRequestData,
+  AnalysisInfoResponseData,
+} from "../../models/api";
 import ApiService from "../apiService";
 
 const host = "http://localhost:30080";
@@ -11,7 +14,7 @@ async function analyticsInfoRequest(payload: AnalysisInfoRequestData) {
       method: "POST",
       data: payload,
     });
-    return response.data;
+    return response.data as AnalysisInfoResponseData;
   } catch (error) {
     console.error("Error en la solicitud:", error);
     throw error;

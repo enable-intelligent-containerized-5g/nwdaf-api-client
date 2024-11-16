@@ -63,3 +63,40 @@ export interface AnalysisInfoRequestData {
   nfInstances?: string[] | null;
   accuracy?: string;
 }
+
+export interface NfLoad {
+  cpuLoad: number;
+  memLoad: number;
+}
+
+export interface AnalyticsNfLoad {
+  container: string;
+  pod: string;
+  nfInstanceId: string;
+  nfType: string;
+  nfStatus: string;
+  cpuLimit: number;
+  cpuUsage: number;
+  memLimit: number;
+  memUsage: number;
+  nfLoad: NfLoad;
+}
+
+export interface AnalysisInfoResponseData {
+  analiticsNfLoad: AnalyticsNfLoad[];
+  analysisType: "Statistics" | "Prediction";
+  eventId: string;
+  offSet: number;
+  targetPeriod: number;
+}
+
+export interface MlModelTrainingRequestData {
+  eventId: string;
+  nfTypes?: string[] | null;
+  startTime: string;
+  targetPeriod: string;
+}
+
+export interface MlModelTrainingResponseData {
+  id: string;
+}

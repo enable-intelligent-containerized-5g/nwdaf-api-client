@@ -31,17 +31,7 @@
       "disabled": false
     }
   ],
-  "nf_types": [
-    "AMF",
-    "AUSF",
-    "NSSF",
-    "NWDAF-ANLF",
-    "NWDAF-MTLF",
-    "PCF",
-    "SMF",
-    "UDM",
-    "UDR"
-  ],
+  "nf_types": ["AMF", "AUSF", "NSSF", "PCF", "SMF", "UDM", "UDR"],
   "analysis_times": [
     {
       "id_analysis_time": 1,
@@ -67,18 +57,13 @@
     },
     {
       "id_default_time": 3,
-      "name": "3m",
-      "code": 3
+      "name": "5m",
+      "code": 5
     },
     {
       "id_default_time": 4,
-      "name": "4m",
-      "code": 4
-    },
-    {
-      "id_default_time": 5,
-      "name": "5m",
-      "code": 5
+      "name": "10m",
+      "code": 10
     }
   ],
   "accuracy_levels": [
