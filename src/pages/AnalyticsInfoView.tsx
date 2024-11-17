@@ -38,7 +38,10 @@ const schema = yup.object().shape({
   nfTypes: yup.array().of(yup.string()).notRequired(),
   nfInstances: yup.array().of(yup.string()).notRequired(),
   analysisTime: yup.string().required("This field is required"),
-  defaultTime: yup.number().required("This field is required"),
+  defaultTime: yup
+    .number()
+    .required("This field is required")
+    .min(1, "This field is required"),
   startTime: yup.string(),
   endTime: yup.string(),
   accuracy: yup.string().required("This field is required"),
@@ -69,22 +72,22 @@ const AnalyticsInfoView = () => {
     resolver: yupResolver(validationSchema),
   });
 
-  const onFinish = async ({
-    analysisMetrics,
-    typeInfoFilter,
-    nfTypes,
-    nfInstances,
-    analysisTime,
-    defaultTime,
-    accuracy,
-  }: AnalysisMetricsForm) => {
+  const onFinish = async (analysisMetricsForm: object) => {
+    const {
+      analysisMetrics,
+      typeInfoFilter,
+      nfTypes,
+      nfInstances,
+      analysisTime,
+      defaultTime,
+      accuracy,
+    } = analysisMetricsForm as AnalysisMetricsForm;
     let startTime = "";
     let endTime = "";
     const currentTime = new Date();
     const pastTime = new Date(currentTime.getTime() - defaultTime * 60000);
 
     const valueTimeFormatted = pastTime.toISOString();
-
     const currentTimeFormatted = currentTime.toISOString();
 
     if (analysisTime === "statistic") {
@@ -95,19 +98,31 @@ const AnalyticsInfoView = () => {
       endTime = valueTimeFormatted;
     }
 
+    // Aseguramos que nfTypes y nfInstances sean siempre un arreglo de strings
+    const validNfTypes = nfTypes
+      ? nfTypes.filter((type): type is string => type !== undefined)
+      : [];
+    const validNfInstances = nfInstances
+      ? nfInstances.filter(
+          (instance): instance is string => instance !== undefined,
+        )
+      : [];
+
     const analysisInfoRequestData: AnalysisInfoRequestData = {
       eventId: analysisMetrics,
       startTime,
       endTime,
       accuracy,
-      ...(typeInfoFilter === "nfType" && nfTypes ? { nfTypes } : {}),
-      ...(typeInfoFilter === "nfInstanceId" && nfInstances
-        ? { nfInstances }
+      ...(typeInfoFilter === "nfType" && validNfTypes.length > 0
+        ? { nfTypes: validNfTypes }
+        : {}),
+      ...(typeInfoFilter === "nfInstanceId" && validNfInstances.length > 0
+        ? { nfInstances: validNfInstances }
         : {}),
     };
+
     analyticsInfoRequest(analysisInfoRequestData).then(
       (response: AnalysisInfoResponseData) => {
-        console.log(response);
         setAnalysisInfoResponseData(response);
       },
     );
@@ -116,9 +131,9 @@ const AnalyticsInfoView = () => {
   const typeInfoFilterValue = watch("typeInfoFilter");
 
   return (
-    <div className="h-[470px]">
-      <Row gutter={[16, 8]}>
-        <Col xs={24} sm={24} md={8} xl={6}>
+    <div className="h-full">
+      <Row gutter={[8, 8]}>
+        <Col className="overflow-auto" xs={24} sm={24} md={8} xl={6}>
           <Form form={form} onFinish={handleSubmit(onFinish)} layout="vertical">
             {/* Analysis Metrics Field */}
             <Row>
@@ -158,7 +173,6 @@ const AnalyticsInfoView = () => {
                     render={({ field }) => {
                       const handleChange = (e: RadioChangeEvent) => {
                         const value = e.target.value;
-                        console.log(value);
                         let newSchema = schema;
                         if (value === "nfType") {
                           newSchema = schema.shape({
@@ -360,16 +374,31 @@ const AnalyticsInfoView = () => {
               <Col>
                 <Title level={1}>{analysisInfoResponseData.eventId}</Title>
                 <Descriptions
-                  items={descriptionItemsInit.map(({ key, label }) => ({
-                    key,
-                    label,
-                    children: analysisInfoResponseData[label],
-                  }))}
+                  items={descriptionItemsInit.map(({ key, label }) => {
+                    const value =
+                      analysisInfoResponseData[
+                        label as keyof AnalysisInfoResponseData
+                      ];
+
+                    // Si value es un objeto NfLoad, convertimos a algo que sea renderizable
+                    const children =
+                      value && typeof value === "object" && "cpuLimit" in value
+                        ? `${value.cpuLimit} (CPU Limit)` // Ejemplo de cómo renderizar parte de NfLoad
+                        : value !== undefined
+                          ? value
+                          : "N/A"; // Valor predeterminado si no existe
+
+                    return {
+                      key,
+                      label,
+                      children,
+                    } as DescriptionsItemType;
+                  })}
                 />
               </Col>
               <Col>
                 <Tabs
-                  tabPosition="left"
+                  tabPosition="top"
                   type="card"
                   items={analysisInfoResponseData.analiticsNfLoad?.map(
                     (analyticsNfLoad: AnalyticsNfLoad) => {
@@ -380,7 +409,6 @@ const AnalyticsInfoView = () => {
                         key: nfInstanceId,
                         children: (
                           <AnalyticsInfoResponseDataView
-                            className={"bg-white p-4 rounded-lg shadow-md"}
                             analyticsInfo={analyticsNfLoad}
                           />
                         ),
