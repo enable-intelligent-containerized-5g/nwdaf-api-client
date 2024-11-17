@@ -1,9 +1,19 @@
-import { Card, Col, Descriptions, Progress, Row, Statistic } from "antd";
+import {
+  Card,
+  Col,
+  Descriptions,
+  Progress,
+  Row,
+  Statistic,
+  Typography,
+} from "antd";
 import { ComponentProps, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { AnalyticsNfLoad } from "../models/api";
 import { DescriptionsItemType } from "antd/es/descriptions";
 import Title from "antd/es/typography/Title";
+
+const { Text } = Typography;
 
 const AnalyticsInfoResponseDataView = ({
   analyticsInfo,
@@ -12,67 +22,119 @@ const AnalyticsInfoResponseDataView = ({
 }: AnalyticsInfoViewProps) => {
   const { container, cpuUsage, nfType, memUsage, cpuLimit, memLimit, nfLoad } =
     analyticsInfo;
-  const [stepsCount] = useState(5);
-  const [stepsGap] = useState(7);
-  const [percentCPU, setPercentCPU] = useState(0);
-  const [percentMem, setPercentMem] = useState(0);
+  const [percentCPU, setPercentCPU] = useState<number>(0);
+  const [percentMem, setPercentMem] = useState<number>(0);
 
   useEffect(() => {
-    const percet = (cpuUsage / cpuLimit) * 100;
-    setPercentCPU(percet);
+    const percent = (cpuUsage / cpuLimit) * 100;
+    const value = !isFinite(percent) || isNaN(percent) ? 0 : percent;
+    setPercentCPU(value);
   }, [cpuUsage, cpuLimit]);
 
   useEffect(() => {
-    const percet = (memUsage / memLimit) * 100;
-    setPercentMem(percet);
+    const percent = (memUsage / memLimit) * 100;
+    const value = !isFinite(percent) || isNaN(percent) ? 0 : percent;
+    setPercentMem(value);
   }, [memUsage, memLimit]);
+
+  const descriptionItems = descriptionItemsInit.map(({ key, label }) => {
+    const value = analyticsInfo[label as keyof AnalyticsNfLoad];
+
+    // Si value es un objeto NfLoad, convertimos a algo que sea renderizable
+    const children =
+      value && typeof value === "object" && "cpuLimit" in value
+        ? `${value.cpuLimit} (CPU Limit)` // Ejemplo de cómo renderizar parte de NfLoad
+        : value !== undefined
+          ? value
+          : "N/A"; // Valor predeterminado si no existe
+
+    return {
+      key,
+      label,
+      children, // Ahora children es siempre un string, number o ReactNode
+    } as DescriptionsItemType;
+  });
 
   return (
     <section className={twMerge(className, "")} {...props}>
       <Row gutter={[16, 16]} justify={"center"}>
         <Col flex="auto">
-          <Title level={2}>
-            {container} - {nfType}
-          </Title>
-          <Descriptions
-            items={descriptionItemsInit.map(({ key, label }) => ({
-              key,
-              label,
-              children: analyticsInfo[label],
-            }))}
-          />
-        </Col>
-        <Col>
-          <Card>
-            <Statistic title="CPU Load" value={nfLoad.cpuLoad} suffix="cores" />
-          </Card>
-        </Col>
-        <Col>
-          <Card>
-            <Statistic title="Memory Load" value={nfLoad.memLoad} suffix="KB" />
-          </Card>
+          <Row>
+            <Title level={2}>
+              {container} - {nfType}
+            </Title>
+            <Descriptions items={descriptionItems} />
+          </Row>
         </Col>
         <Col span={24}>
-          <Row gutter={[16, 16]} justify={"center"}>
-            <Col>
-              <Card>
-                <Progress
-                  type="circle"
-                  percent={percentCPU}
-                  steps={{ count: stepsCount, gap: stepsGap }}
-                  strokeWidth={20}
-                />
-              </Card>
+          <Row gutter={[8, 8]}>
+            <Col span={6}>
+              <Row gutter={[8, 8]}>
+                <Col span={24}>
+                  <Card>
+                    <Statistic
+                      title="CPU Load"
+                      value={nfLoad.cpuLoad}
+                      suffix="cores"
+                    />
+                  </Card>
+                </Col>
+                <Col span={24}>
+                  <Card>
+                    <Statistic
+                      title="Memory Load"
+                      value={nfLoad.memLoad}
+                      suffix="KB"
+                    />
+                  </Card>
+                </Col>
+              </Row>
             </Col>
-            <Col>
-              <Card>
-                <Progress
-                  type="circle"
-                  percent={percentMem}
-                  steps={{ count: stepsCount, gap: stepsGap }}
-                  strokeWidth={20}
-                />
-              </Card>
+            <Col span={18}>
+              <Row gutter={[16, 16]} justify={"center"}>
+                <Col span={12}>
+                  <Card>
+                    <Row justify={"center"} gutter={[4, 4]}>
+                      <Col span={24}>
+                        <Text type="secondary">CPU Usage</Text>
+                      </Col>
+                      <Col span={24}>
+                        <Row justify={"center"}>
+                          <Progress
+                            type="dashboard"
+                            percent={percentCPU}
+                            steps={8}
+                            strokeWidth={20}
+                            trailColor="rgba(0, 0, 0, 0.06)"
+                            size={160}
+                          />
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card>
+                    <Row justify={"center"} gutter={[4, 4]}>
+                      <Col span={24}>
+                        <Text type="secondary">Memory Usage</Text>
+                      </Col>
+                      <Col span={24}>
+                        <Row justify={"center"}>
+                          <Progress
+                            type="dashboard"
+                            percent={percentMem}
+                            steps={8}
+                            strokeWidth={20}
+                            trailColor="rgba(0, 0, 0, 0.06)"
+                            size={160}
+                          />
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Card>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </Col>
@@ -89,27 +151,27 @@ const descriptionItemsInit: DescriptionsItemType[] = [
   {
     key: "1",
     label: "container",
-    children: "value",
+    children: "",
   },
   {
     key: "2",
     label: "pod",
-    children: "value",
+    children: "",
   },
   {
     key: "3",
     label: "nfInstanceId",
-    children: "value",
+    children: "",
   },
   {
     key: "4",
     label: "nfType",
-    children: "value",
+    children: "",
   },
   {
     key: "5",
     label: "nfStatus",
-    children: "value",
+    children: "",
   },
 ];
 

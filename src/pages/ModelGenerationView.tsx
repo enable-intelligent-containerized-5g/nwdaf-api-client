@@ -21,12 +21,14 @@ import {
 import { mlModelTrainingRequest } from "../http/ml_model_training/ml_model_training";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
+import MlModelTrainingResponseDataView from "../components/MlModelTrainingResponseDataView";
 
 const schema = yup.object().shape({
   eventId: yup.string().required("This field is required"),
-  nfTypes: yup.array().of(yup.string()).required("This field is required"),
+  nfType: yup.string().required("This field is required"),
   startTime: yup.string(),
   targetPeriod: yup.string().required("This field is required"),
+  newDataset: yup.boolean().required("This field is required"),
 });
 
 const { Item } = Form;
@@ -49,33 +51,32 @@ const ModelGenerationView = () => {
     resolver: yupResolver(validationSchema),
   });
 
-  const onFinish = async ({
-    eventId,
-    nfTypes,
-    targetPeriod,
-  }: MlModelTrainingForm) => {
+  const onFinish = async (mlModelTrainingForm: object) => {
+    const { eventId, nfType, targetPeriod, newDataset } =
+      mlModelTrainingForm as MlModelTrainingForm;
     const currentTime = new Date();
 
     const startTimeFormatted = currentTime.toISOString();
 
     const mlModelTrainingResquestData: MlModelTrainingRequestData = {
-      nfTypes,
+      nfType,
       eventId,
       targetPeriod,
       startTime: startTimeFormatted,
+      newDataset,
     };
+
     mlModelTrainingRequest(mlModelTrainingResquestData).then(
       (response: MlModelTrainingResponseData) => {
-        console.log(response);
         setMlModelTrainingResponseData(response);
       },
     );
   };
 
   return (
-    <div className="h-[470px]">
+    <div className="h-full">
       <Row>
-        <Col>
+        <Col className="h-[450px] overflow-auto" xs={24} sm={24} md={8} xl={6}>
           <Form form={form} onFinish={handleSubmit(onFinish)} layout="vertical">
             <Row>
               <Col flex={"auto"}>
@@ -103,19 +104,18 @@ const ModelGenerationView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Item
-                  label="NF Types"
-                  validateStatus={errors.nfTypes ? "error" : ""}
-                  help={errors.nfTypes?.message}
+                  label="NF Type"
+                  validateStatus={errors.nfType ? "error" : ""}
+                  help={errors.nfType?.message}
                 >
                   <Controller
-                    name="nfTypes"
+                    name="nfType"
                     control={control}
                     render={({ field }) => (
                       <Select
                         {...field}
                         options={optionsNfTypes}
                         placeholder="Select multiple"
-                        mode="multiple"
                         allowClear
                       ></Select>
                     )}
@@ -139,7 +139,6 @@ const ModelGenerationView = () => {
                         const value = e.target.value;
                         field.onChange(value);
                       };
-
                       return (
                         <Radio.Group
                           {...field}
@@ -157,6 +156,31 @@ const ModelGenerationView = () => {
 
             <Row>
               <Col flex={"auto"}>
+                <Item
+                  label="New dataset"
+                  validateStatus={errors.newDataset ? "error" : ""}
+                  help={errors.newDataset?.message}
+                >
+                  <Controller
+                    name="newDataset"
+                    control={control}
+                    render={({ field }) => (
+                      <Radio.Group
+                        {...field}
+                        buttonStyle="solid"
+                        optionType="button"
+                      >
+                        <Radio value="true">Yes</Radio>
+                        <Radio value="false">No</Radio>
+                      </Radio.Group>
+                    )}
+                  />
+                </Item>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col flex={"auto"}>
                 <Button type="primary" htmlType="submit">
                   Enviar consulta
                 </Button>
@@ -165,8 +189,16 @@ const ModelGenerationView = () => {
           </Form>
         </Col>
         <Col xs={24} sm={24} md={16} xl={18}>
-          {mlModelTrainingResponseData.id && <Row gutter={[16, 16]}></Row>}
-          {!mlModelTrainingResponseData.id && (
+          {mlModelTrainingResponseData.name && (
+            <Row gutter={[16, 16]}>
+              <Col>
+                <MlModelTrainingResponseDataView
+                  mlModelTraining={mlModelTrainingResponseData}
+                />
+              </Col>
+            </Row>
+          )}
+          {!mlModelTrainingResponseData.name && (
             <div className="h-full w-full flex justify-center items-center">
               <Empty
                 imageStyle={{ height: 160 }}
@@ -182,9 +214,10 @@ const ModelGenerationView = () => {
 
 interface MlModelTrainingForm {
   eventId: string;
-  nfTypes: string[];
+  nfType: string;
   targetPeriod: string;
   startTime: string;
+  newDataset: boolean;
 }
 
 export default ModelGenerationView;

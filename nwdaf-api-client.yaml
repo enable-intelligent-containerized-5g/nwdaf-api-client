@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-app-deployment
+  labels:
+    app: react-app
+spec:
+  replicas: 3 # Número de réplicas que deseas desplegar
+  selector:
+    matchLabels:
+      app: react-app
+  template:
+    metadata:
+      labels:
+        app: react-app
+    spec:
+      containers:
+        - name: react-app
+          image: tuusuario/tuimagen:latest # Cambia a tu nombre de imagen
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: Always # Asegura que Kubernetes siempre busque la última versión de la imagen

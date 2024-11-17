@@ -30,7 +30,7 @@ const App: FC = () => {
   return (
     <div className="w-full h-full flex justify-center items-center">
       <Card
-        className="w-[1280px] h-[700px]"
+        className="w-[1280px]"
         title={<Logo className="max-w-[150px] max-h-[150px]" />}
         tabList={tabs}
         activeTabKey={activeTabKey}
@@ -47,12 +47,11 @@ const App: FC = () => {
         <Layout>
           <Content
             style={{
-              minHeight: 280,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
             }}
           >
-            {contentList[activeTabKey]}
+            <div className="h-full">{contentList[activeTabKey]}</div>
           </Content>
           <Footer className="bg-white">
             <div className="flex justify-center items-center">

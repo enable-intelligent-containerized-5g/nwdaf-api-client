@@ -92,11 +92,28 @@ export interface AnalysisInfoResponseData {
 
 export interface MlModelTrainingRequestData {
   eventId: string;
-  nfTypes?: string[] | null;
+  nfType: string | null;
   startTime: string;
   targetPeriod: string;
+  newDataset: boolean;
 }
 
 export interface MlModelTrainingResponseData {
-  id: string;
+  name: string;
+  size: number;
+  eventId: string;
+  targetPeriod: number;
+  confidence: Confidence;
+  accuracy: string;
+  nfType: string;
+  figure: string;
+}
+
+export interface Confidence {
+  mse: number;
+  r2: number;
+  mse_cpu: number;
+  r2_cpu: number;
+  mse_mem: number;
+  r2_mem: number;
 }
