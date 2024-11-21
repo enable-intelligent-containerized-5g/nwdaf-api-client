@@ -28,7 +28,7 @@ const App: FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex justify-center items-center">
+    <div className="w-full min-h-screen flex justify-center items-center overflow-y-auto">
       <Card
         className="w-[1280px]"
         title={<Logo className="max-w-[150px] max-h-[150px]" />}
@@ -44,8 +44,9 @@ const App: FC = () => {
           </a>
         }
       >
-        <Layout>
+        <Layout className="h-full">
           <Content
+            className="h-full"
             style={{
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
