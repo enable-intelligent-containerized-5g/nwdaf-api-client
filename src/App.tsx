@@ -8,8 +8,8 @@ import { GithubOutlined } from "@ant-design/icons";
 const { Content, Footer } = Layout;
 
 const tabs: TabsProps["items"] = [
-  { key: "tab1", label: "Analysis Info NF" },
-  { key: "tab2", label: "Model Generation" },
+  { key: "tab1", label: "NF Analysis Info" },
+  { key: "tab2", label: "Ml Model Training" },
 ];
 
 const contentList: Record<string, ReactNode> = {

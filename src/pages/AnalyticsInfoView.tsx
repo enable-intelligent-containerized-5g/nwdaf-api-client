@@ -47,7 +47,7 @@ const schema = yup.object().shape({
     .min(1, "This field is required"),
   startTime: yup.string(),
   endTime: yup.string(),
-  accuracy: yup.string().required("This field is required"),
+  accuracy: yup.string(),
 });
 
 const { Item } = Form;
@@ -66,6 +66,7 @@ const AnalyticsInfoView = () => {
     useState<AnalysisInfoResponseData>({} as AnalysisInfoResponseData);
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [showAccuracyLevel, setShowAccuracyLevel] = useState(false);
 
   const {
     handleSubmit,
@@ -91,7 +92,7 @@ const AnalyticsInfoView = () => {
     let startTime = "";
     let endTime = "";
     const currentTime = new Date();
-    const pastTime = new Date(currentTime.getTime() - defaultTime * 600);
+    const pastTime = new Date(currentTime.getTime() - defaultTime * 1000);
 
     const valueTimeFormatted = pastTime.toISOString();
     const currentTimeFormatted = currentTime.toISOString();
@@ -285,7 +286,7 @@ const AnalyticsInfoView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Item
-                  label="Time of analysis"
+                  label="Analysis time"
                   validateStatus={errors.analysisTime ? "error" : ""}
                   help={errors.analysisTime?.message}
                 >
@@ -299,6 +300,21 @@ const AnalyticsInfoView = () => {
                         setValue("startTime", "");
                         setValue("endTime", "");
 
+                        setShowAccuracyLevel(value === "prediction");
+                        let newSchema = schema;
+                        if (value === "prediction") {
+                          newSchema = schema.shape({
+                            accuracy: yup
+                              .string()
+                              .required("This field is required"),
+                          });
+                        } else {
+                          newSchema = schema.shape({
+                            accuracy: yup.string(),
+                          });
+                          setValue("accuracy", "");
+                        }
+                        setValidationSchema(newSchema);
                         field.onChange(value);
                       };
 
@@ -320,7 +336,7 @@ const AnalyticsInfoView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Item
-                  label="Time of analysis"
+                  label="Default times"
                   validateStatus={errors.defaultTime ? "error" : ""}
                   help={errors.defaultTime?.message}
                 >
@@ -349,113 +365,110 @@ const AnalyticsInfoView = () => {
             </Row>
 
             <Row>
-              <Col flex={"auto"}>
-                <Item
-                  label="Accuracy levels"
-                  validateStatus={errors.accuracy ? "error" : ""}
-                  help={errors.accuracy?.message}
-                >
-                  <Controller
-                    name="accuracy"
-                    control={control}
-                    render={({ field }) => (
-                      <Radio.Group
-                        {...field}
-                        options={optionsAccuracyLevels}
-                        buttonStyle="solid"
-                        optionType="button"
-                      />
-                    )}
-                  />
-                </Item>
-              </Col>
+              {showAccuracyLevel && (
+                <Col flex={"auto"}>
+                  <Item
+                    label="Accuracy levels"
+                    validateStatus={errors.accuracy ? "error" : ""}
+                    help={errors.accuracy?.message}
+                  >
+                    <Controller
+                      name="accuracy"
+                      control={control}
+                      render={({ field }) => (
+                        <Radio.Group
+                          {...field}
+                          options={optionsAccuracyLevels}
+                          buttonStyle="solid"
+                          optionType="button"
+                        />
+                      )}
+                    />
+                  </Item>
+                </Col>
+              )}
             </Row>
 
             <Row>
               <Col flex={"auto"}>
                 <Button type="primary" htmlType="submit">
-                  Enviar consulta
+                  Submit
                 </Button>
               </Col>
             </Row>
           </Form>
         </Col>
         <Col xs={24} sm={24} md={16} xl={18}>
-          {analysisInfoResponseData.eventId && (
-            <Row gutter={[16, 16]}>
-              <Col>
-                <Title level={1}>{analysisInfoResponseData.eventId}</Title>
-                <Descriptions
-                  items={descriptionItemsInit.map(({ key, label }) => {
-                    const value =
-                      analysisInfoResponseData[
-                        label as keyof AnalysisInfoResponseData
-                      ];
-
-                    // Si value es un objeto NfLoad, convertimos a algo que sea renderizable
-                    const children =
-                      value && typeof value === "object" && "cpuLimit" in value
-                        ? `${value.cpuLimit} (CPU Limit)` // Ejemplo de cómo renderizar parte de NfLoad
-                        : value !== undefined
-                          ? value
-                          : "N/A"; // Valor predeterminado si no existe
-
-                    return {
-                      key,
-                      label,
-                      children,
-                    } as DescriptionsItemType;
-                  })}
+          <div className="relative">
+            {loading && (
+              <div className="absolute inset-0 flex justify-center items-center z-10 bg-opacity-50 bg-white">
+                <Spin
+                  indicator={<LoadingOutlined spin />}
+                  tip="Analysis in progress..."
+                  size="large"
                 />
-              </Col>
-              <Col>
-                <Tabs
-                  tabPosition="top"
-                  type="card"
-                  items={analysisInfoResponseData.analiticsNfLoad?.map(
-                    (analyticsNfLoad: AnalyticsNfLoad) => {
-                      const { container, nfInstanceId } = analyticsNfLoad;
+              </div>
+            )}
+
+            {analysisInfoResponseData.eventId ? (
+              <Row gutter={[16, 16]}>
+                <Col>
+                  <Title level={1}>{analysisInfoResponseData.eventId}</Title>
+                  <Descriptions
+                    items={descriptionItemsInit.map(({ key, label }) => {
+                      const value =
+                        analysisInfoResponseData[
+                          label as keyof AnalysisInfoResponseData
+                        ];
+
+                      // Si value es un objeto NfLoad, convertimos a algo que sea renderizable
+                      const children =
+                        value &&
+                        typeof value === "object" &&
+                        "cpuLimit" in value
+                          ? `${value.cpuLimit} (CPU Limit)` // Ejemplo de cómo renderizar parte de NfLoad
+                          : value !== undefined
+                            ? value
+                            : "N/A"; // Valor predeterminado si no existe
 
                       return {
-                        label: container,
-                        key: nfInstanceId,
-                        children: (
-                          <AnalyticsInfoResponseDataView
-                            analyticsInfo={analyticsNfLoad}
-                          />
-                        ),
-                      };
-                    },
-                  )}
-                />
-              </Col>
-            </Row>
-          )}
-          {!analysisInfoResponseData.eventId && (
-            <div className="h-full w-full flex justify-center items-center">
-              {loading ? (
-                <Row justify={"center"}>
-                  <Col>
-                    <Spin
-                      indicator={<LoadingOutlined spin />}
-                      tip="Analysis in progess..."
-                      size="large"
-                    >
-                      <Empty
-                        imageStyle={{ height: 160 }}
-                        description={<Text>No data to analyze</Text>}
-                      />
-                    </Spin>
-                  </Col>
-                </Row>
-              ) : (
-                <Empty
-                  imageStyle={{ height: 160 }}
-                  description={<Text>No data to analyze</Text>}
-                />
-              )}
-            </div>
-          )}
+                        key,
+                        label,
+                        children,
+                      } as DescriptionsItemType;
+                    })}
+                  />
+                </Col>
+                <Col>
+                  <Tabs
+                    tabPosition="top"
+                    type="card"
+                    items={analysisInfoResponseData.analiticsNfLoad?.map(
+                      (analyticsNfLoad: AnalyticsNfLoad) => {
+                        const { container, nfInstanceId } = analyticsNfLoad;
+
+                        return {
+                          label: container,
+                          key: nfInstanceId,
+                          children: (
+                            <AnalyticsInfoResponseDataView
+                              analyticsInfo={analyticsNfLoad}
+                            />
+                          ),
+                        };
+                      },
+                    )}
+                  />
+                </Col>
+              </Row>
+            ) : (
+              // Mostrar mensaje vacío si no hay eventId
+              <Empty
+                imageStyle={{ height: 160 }}
+                description={<Text>No data to analyze</Text>}
+              />
+            )}
+          </div>
         </Col>
       </Row>
     </div>

@@ -28,7 +28,7 @@
       "id_metric": 3,
       "name": "Load Level Information",
       "code": "LOAD_LEVEL_INFORMATION",
-      "disabled": false
+      "disabled": true
     }
   ],
   "nf_types": ["AMF", "AUSF", "NSSF", "PCF", "SMF", "UDM", "UDR"],

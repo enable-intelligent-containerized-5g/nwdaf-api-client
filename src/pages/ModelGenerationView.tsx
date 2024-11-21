@@ -252,47 +252,39 @@ const ModelGenerationView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Button type="primary" htmlType="submit">
-                  Enviar consulta
+                  Submit
                 </Button>
               </Col>
             </Row>
           </Form>
         </Col>
         <Col xs={24} sm={24} md={16} xl={18}>
-          {mlModelTrainingResponseData.name && (
-            <Row gutter={[16, 16]}>
-              <Col>
-                <MlModelTrainingResponseDataView
-                  mlModelTraining={mlModelTrainingResponseData}
+          <div className="relative">
+            {loading && (
+              <div className="absolute inset-0 flex justify-center items-center z-10 bg-opacity-50 bg-white">
+                <Spin
+                  indicator={<LoadingOutlined spin />}
+                  tip="Training in progress..."
+                  size="large"
                 />
-              </Col>
-            </Row>
-          )}
-          {!mlModelTrainingResponseData.name && (
-            <div className="h-full w-full flex justify-center items-center">
-              {loading ? (
-                <Row justify={"center"}>
-                  <Col>
-                    <Spin
-                      indicator={<LoadingOutlined spin />}
-                      tip="Training in progess..."
-                      size="large"
-                    >
-                      <Empty
-                        imageStyle={{ height: 160 }}
-                        description={<Text>No data to training</Text>}
-                      />
-                    </Spin>
-                  </Col>
-                </Row>
-              ) : (
-                <Empty
-                  imageStyle={{ height: 160 }}
-                  description={<Text>No data to training</Text>}
-                />
-              )}
-            </div>
-          )}
+              </div>
+            )}
+
+            {mlModelTrainingResponseData.name ? (
+              <Row gutter={[16, 16]}>
+                <Col>
+                  <MlModelTrainingResponseDataView
+                    mlModelTraining={mlModelTrainingResponseData}
+                  />
+                </Col>
+              </Row>
+            ) : (
+              <Empty
+                imageStyle={{ height: 160 }}
+                description={<Text>No data to training</Text>}
+              />
+            )}
+          </div>
         </Col>
       </Row>
     </div>
