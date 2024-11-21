@@ -48,22 +48,22 @@
     {
       "id_default_time": 1,
       "name": "1m",
-      "code": 1
+      "code": 60
     },
     {
       "id_default_time": 2,
       "name": "2m",
-      "code": 2
+      "code": 120
     },
     {
       "id_default_time": 3,
       "name": "5m",
-      "code": 5
+      "code": 300
     },
     {
       "id_default_time": 4,
       "name": "10m",
-      "code": 10
+      "code": 600
     }
   ],
   "accuracy_levels": [

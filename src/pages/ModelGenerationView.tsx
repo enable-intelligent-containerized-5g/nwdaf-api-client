@@ -1,14 +1,20 @@
 import {
   Button,
   Col,
+  DatePicker,
   Empty,
   Form,
+  message,
   Radio,
   RadioChangeEvent,
   Row,
   Select,
+  Space,
+  Spin,
+  TimePicker,
   Typography,
 } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import * as yup from "yup";
 import { useAnalisysMetric } from "../hooks/useAnalisysMetric";
 import { useNfType } from "../hooks/useNfType";
@@ -26,8 +32,8 @@ import MlModelTrainingResponseDataView from "../components/MlModelTrainingRespon
 const schema = yup.object().shape({
   eventId: yup.string().required("This field is required"),
   nfType: yup.string().required("This field is required"),
-  startTime: yup.string(),
-  targetPeriod: yup.string().required("This field is required"),
+  startTime: yup.string().required("This field is required"),
+  targetPeriod: yup.number().required("This field is required"),
   newDataset: yup.boolean().required("This field is required"),
 });
 
@@ -42,6 +48,8 @@ const ModelGenerationView = () => {
   const { optionsDefaultTime } = useDefaultTime();
   const [mlModelTrainingResponseData, setMlModelTrainingResponseData] =
     useState<MlModelTrainingResponseData>({} as MlModelTrainingResponseData);
+  const [loading, setLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const {
     handleSubmit,
@@ -52,31 +60,40 @@ const ModelGenerationView = () => {
   });
 
   const onFinish = async (mlModelTrainingForm: object) => {
-    const { eventId, nfType, targetPeriod, newDataset } =
+    setLoading(true);
+    const { eventId, nfType, targetPeriod, newDataset, startTime } =
       mlModelTrainingForm as MlModelTrainingForm;
-    const currentTime = new Date();
-
-    const startTimeFormatted = currentTime.toISOString();
-
     const mlModelTrainingResquestData: MlModelTrainingRequestData = {
       nfType,
       eventId,
       targetPeriod,
-      startTime: startTimeFormatted,
+      startTime,
       newDataset,
     };
 
-    mlModelTrainingRequest(mlModelTrainingResquestData).then(
-      (response: MlModelTrainingResponseData) => {
+    mlModelTrainingRequest(mlModelTrainingResquestData)
+      .then((response: MlModelTrainingResponseData) => {
         setMlModelTrainingResponseData(response);
-      },
-    );
+      })
+      .finally(() => {
+        setLoading(false);
+      })
+      .catch((error) => {
+        messageApi.error(`Error to training model: ${error.message}`);
+      });
   };
 
   return (
     <div className="h-full">
-      <Row>
-        <Col className="h-[450px] overflow-auto" xs={24} sm={24} md={8} xl={6}>
+      {contextHolder}
+      <Row gutter={[8, 8]}>
+        <Col
+          className="min-h-[450px] overflow-auto"
+          xs={24}
+          sm={24}
+          md={8}
+          xl={6}
+        >
           <Form form={form} onFinish={handleSubmit(onFinish)} layout="vertical">
             <Row>
               <Col flex={"auto"}>
@@ -157,6 +174,59 @@ const ModelGenerationView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Item
+                  label="Start Time"
+                  validateStatus={errors.startTime ? "error" : ""}
+                  help={errors.startTime?.message}
+                >
+                  <Controller
+                    name="startTime"
+                    control={control}
+                    render={({ field }) => (
+                      <Space>
+                        <DatePicker
+                          onChange={(date) => {
+                            const time = field.value
+                              ? new Date(field.value)
+                              : new Date();
+                            const combinedDate = new Date(
+                              date.year(),
+                              date.month(),
+                              date.date(),
+                              time.getHours(),
+                              time.getMinutes(),
+                            );
+                            const isoString = combinedDate.toISOString();
+                            field.onChange(isoString);
+                          }}
+                        />
+                        <TimePicker
+                          onChange={(time) => {
+                            if (time) {
+                              const date = field.value
+                                ? new Date(field.value)
+                                : new Date();
+                              const combinedDate = new Date(
+                                date.getFullYear(),
+                                date.getMonth(),
+                                date.getDate(),
+                                time.hour(),
+                                time.minute(),
+                              );
+                              const isoString = combinedDate.toISOString();
+                              field.onChange(isoString);
+                            }
+                          }}
+                        />
+                      </Space>
+                    )}
+                  />
+                </Item>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col flex={"auto"}>
+                <Item
                   label="New dataset"
                   validateStatus={errors.newDataset ? "error" : ""}
                   help={errors.newDataset?.message}
@@ -200,10 +270,27 @@ const ModelGenerationView = () => {
           )}
           {!mlModelTrainingResponseData.name && (
             <div className="h-full w-full flex justify-center items-center">
-              <Empty
-                imageStyle={{ height: 160 }}
-                description={<Text>No data to analyze</Text>}
-              />
+              {loading ? (
+                <Row justify={"center"}>
+                  <Col>
+                    <Spin
+                      indicator={<LoadingOutlined spin />}
+                      tip="Training in progess..."
+                      size="large"
+                    >
+                      <Empty
+                        imageStyle={{ height: 160 }}
+                        description={<Text>No data to training</Text>}
+                      />
+                    </Spin>
+                  </Col>
+                </Row>
+              ) : (
+                <Empty
+                  imageStyle={{ height: 160 }}
+                  description={<Text>No data to training</Text>}
+                />
+              )}
             </div>
           )}
         </Col>

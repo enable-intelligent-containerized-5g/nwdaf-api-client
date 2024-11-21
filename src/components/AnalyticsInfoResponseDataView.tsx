@@ -63,7 +63,7 @@ const AnalyticsInfoResponseDataView = ({
             <Title level={2}>
               {container} - {nfType}
             </Title>
-            <Descriptions items={descriptionItems} />
+            <Descriptions items={descriptionItems} size={"small"} />
           </Row>
         </Col>
         <Col span={24}>
@@ -154,23 +154,23 @@ const descriptionItemsInit: DescriptionsItemType[] = [
     children: "",
   },
   {
-    key: "2",
-    label: "pod",
-    children: "",
-  },
-  {
-    key: "3",
-    label: "nfInstanceId",
-    children: "",
-  },
-  {
     key: "4",
     label: "nfType",
     children: "",
   },
   {
+    key: "2",
+    label: "pod",
+    children: "",
+  },
+  {
     key: "5",
     label: "nfStatus",
+    children: "",
+  },
+  {
+    key: "3",
+    label: "nfInstanceId",
     children: "",
   },
 ];
