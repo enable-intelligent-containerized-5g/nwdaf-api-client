@@ -10,7 +10,10 @@ import {
   Tabs,
   Typography,
   Form,
+  Spin,
+  message,
 } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { Controller, useForm } from "react-hook-form";
 import { useTypeInfoFilter } from "../hooks/useTypeInfoFilter";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -61,6 +64,8 @@ const AnalyticsInfoView = () => {
   const { optionsAccuracyLevels } = useAccuracyLevel();
   const [analysisInfoResponseData, setAnalysisInfoResponseData] =
     useState<AnalysisInfoResponseData>({} as AnalysisInfoResponseData);
+  const [loading, setLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const {
     handleSubmit,
@@ -73,6 +78,7 @@ const AnalyticsInfoView = () => {
   });
 
   const onFinish = async (analysisMetricsForm: object) => {
+    setLoading(true);
     const {
       analysisMetrics,
       typeInfoFilter,
@@ -85,7 +91,7 @@ const AnalyticsInfoView = () => {
     let startTime = "";
     let endTime = "";
     const currentTime = new Date();
-    const pastTime = new Date(currentTime.getTime() - defaultTime * 60000);
+    const pastTime = new Date(currentTime.getTime() - defaultTime * 600);
 
     const valueTimeFormatted = pastTime.toISOString();
     const currentTimeFormatted = currentTime.toISOString();
@@ -121,17 +127,23 @@ const AnalyticsInfoView = () => {
         : {}),
     };
 
-    analyticsInfoRequest(analysisInfoRequestData).then(
-      (response: AnalysisInfoResponseData) => {
+    analyticsInfoRequest(analysisInfoRequestData)
+      .then((response: AnalysisInfoResponseData) => {
         setAnalysisInfoResponseData(response);
-      },
-    );
+      })
+      .finally(() => {
+        setLoading(false);
+      })
+      .catch((error) => {
+        messageApi.error(`Error to analysis NFs: ${error.message}`);
+      });
   };
 
   const typeInfoFilterValue = watch("typeInfoFilter");
 
   return (
     <div className="h-full">
+      {contextHolder}
       <Row gutter={[8, 8]}>
         <Col className="overflow-auto" xs={24} sm={24} md={8} xl={6}>
           <Form form={form} onFinish={handleSubmit(onFinish)} layout="vertical">
@@ -421,10 +433,27 @@ const AnalyticsInfoView = () => {
           )}
           {!analysisInfoResponseData.eventId && (
             <div className="h-full w-full flex justify-center items-center">
-              <Empty
-                imageStyle={{ height: 160 }}
-                description={<Text>No data to analyze</Text>}
-              />
+              {loading ? (
+                <Row justify={"center"}>
+                  <Col>
+                    <Spin
+                      indicator={<LoadingOutlined spin />}
+                      tip="Analysis in progess..."
+                      size="large"
+                    >
+                      <Empty
+                        imageStyle={{ height: 160 }}
+                        description={<Text>No data to analyze</Text>}
+                      />
+                    </Spin>
+                  </Col>
+                </Row>
+              ) : (
+                <Empty
+                  imageStyle={{ height: 160 }}
+                  description={<Text>No data to analyze</Text>}
+                />
+              )}
             </div>
           )}
         </Col>
