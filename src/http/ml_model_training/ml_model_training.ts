@@ -8,15 +8,17 @@ import { loadConfig } from "../getConfig";
 let host = "http://localhost:30081";
 const path = "nnwdaf-mlmodeltraining/v1";
 
-const config = await loadConfig();
-if (config?.nwdafMtlfUri) {
-  host = config.nwdafMtlfUri
-} else {
-  console.error("No found MTLF URI in configuration file");
-}
+
 
 async function mlModelTrainingRequest(payload: MlModelTrainingRequestData) {
   try {
+    const config = await loadConfig();
+    if (config?.nwdafMtlfUri) {
+      host = config.nwdafMtlfUri
+    } else {
+      console.error("No found MTLF URI in configuration file");
+    }
+
     const response = await ApiService({
       endpoint: `${host}/${path}/mlmodeltraining/request`,
       method: "POST",
