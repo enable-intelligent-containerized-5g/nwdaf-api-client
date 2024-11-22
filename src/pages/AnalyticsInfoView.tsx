@@ -92,15 +92,19 @@ const AnalyticsInfoView = () => {
     let startTime = "";
     let endTime = "";
     const currentTime = new Date();
-    const pastTime = new Date(currentTime.getTime() - defaultTime * 1000);
-
-    const valueTimeFormatted = pastTime.toISOString();
-    const currentTimeFormatted = currentTime.toISOString();
 
     if (analysisTime === "statistic") {
+      console.log("statistic");
+      const pastTime = new Date(currentTime.getTime() - defaultTime * 1000);
+      const valueTimeFormatted = pastTime.toISOString();
+      const currentTimeFormatted = currentTime.toISOString();
       startTime = valueTimeFormatted;
       endTime = currentTimeFormatted;
     } else {
+      console.log("prediction");
+      const futureTime = new Date(currentTime.getTime() + defaultTime * 1000);
+      const valueTimeFormatted = futureTime.toISOString();
+      const currentTimeFormatted = currentTime.toISOString();
       startTime = currentTimeFormatted;
       endTime = valueTimeFormatted;
     }
@@ -136,7 +140,8 @@ const AnalyticsInfoView = () => {
         setLoading(false);
       })
       .catch((error) => {
-        messageApi.error(`Error to analysis NFs: ${error.message}`);
+        const { detail: message } = error.response.data;
+        messageApi.error(`Error to analysis NFs: ${message}`);
       });
   };
 
@@ -286,7 +291,7 @@ const AnalyticsInfoView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Item
-                  label="Analysis time"
+                  label="Analysis type"
                   validateStatus={errors.analysisTime ? "error" : ""}
                   help={errors.analysisTime?.message}
                 >
@@ -301,20 +306,6 @@ const AnalyticsInfoView = () => {
                         setValue("endTime", "");
 
                         setShowAccuracyLevel(value === "prediction");
-                        let newSchema = schema;
-                        if (value === "prediction") {
-                          newSchema = schema.shape({
-                            accuracy: yup
-                              .string()
-                              .required("This field is required"),
-                          });
-                        } else {
-                          newSchema = schema.shape({
-                            accuracy: yup.string(),
-                          });
-                          setValue("accuracy", "");
-                        }
-                        setValidationSchema(newSchema);
                         field.onChange(value);
                       };
 
@@ -336,7 +327,7 @@ const AnalyticsInfoView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Item
-                  label="Default times"
+                  label="Target period"
                   validateStatus={errors.defaultTime ? "error" : ""}
                   help={errors.defaultTime?.message}
                 >
@@ -402,11 +393,7 @@ const AnalyticsInfoView = () => {
           <div className="relative">
             {loading && (
               <div className="absolute inset-0 flex justify-center items-center z-10 bg-opacity-50 bg-white">
-                <Spin
-                  indicator={<LoadingOutlined spin />}
-                  tip="Analysis in progress..."
-                  size="large"
-                />
+                <Spin indicator={<LoadingOutlined spin />} size="large" />
               </div>
             )}
 
@@ -416,10 +403,14 @@ const AnalyticsInfoView = () => {
                   <Title level={1}>{analysisInfoResponseData.eventId}</Title>
                   <Descriptions
                     items={descriptionItemsInit.map(({ key, label }) => {
-                      const value =
+                      let value =
                         analysisInfoResponseData[
                           label as keyof AnalysisInfoResponseData
                         ];
+
+                      if (label === "targetPeriod") {
+                        value = Number(value) / 60 + "m";
+                      }
 
                       // Si value es un objeto NfLoad, convertimos a algo que sea renderizable
                       const children =

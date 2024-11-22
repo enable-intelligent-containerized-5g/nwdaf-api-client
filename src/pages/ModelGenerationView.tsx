@@ -79,7 +79,8 @@ const ModelGenerationView = () => {
         setLoading(false);
       })
       .catch((error) => {
-        messageApi.error(`Error to training model: ${error.message}`);
+        const { detail: message } = error.response.data;
+        messageApi.error(`Error to analysis NFs: ${message}`);
       });
   };
 
@@ -144,7 +145,7 @@ const ModelGenerationView = () => {
             <Row>
               <Col flex={"auto"}>
                 <Item
-                  label="Time of analysis"
+                  label="Target period"
                   validateStatus={errors.targetPeriod ? "error" : ""}
                   help={errors.targetPeriod?.message}
                 >
@@ -262,11 +263,7 @@ const ModelGenerationView = () => {
           <div className="relative">
             {loading && (
               <div className="absolute inset-0 flex justify-center items-center z-10 bg-opacity-50 bg-white">
-                <Spin
-                  indicator={<LoadingOutlined spin />}
-                  tip="Training in progress..."
-                  size="large"
-                />
+                <Spin indicator={<LoadingOutlined spin />} size="large" />
               </div>
             )}
 
