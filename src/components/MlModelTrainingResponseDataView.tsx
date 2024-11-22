@@ -11,14 +11,7 @@ const MlModelTrainingResponseDataView = ({
   ...props
 }: MlModelTrainingResponseDataViewProps) => {
   const { name, confidence, figure } = mlModelTraining;
-  const {
-    mse,
-    r2,
-    mseCpu: mse_cpu,
-    r2Cpu: r2_cpu,
-    mseMem: mse_mem,
-    r2Mem: r2_mem,
-  } = confidence;
+  const { mse, r2, mseCpu, r2Cpu, mseMem, r2Mem } = confidence;
 
   const tabs: TabsProps["items"] = [
     {
@@ -31,26 +24,15 @@ const MlModelTrainingResponseDataView = ({
               <Row gutter={[8, 8]}>
                 <Col span={12}>
                   <Card>
-                    <Statistic title="Average MSE" value={mse} />
+                    <Statistic
+                      title="Average MSE"
+                      value={mse.toExponential(3)}
+                    />
                   </Card>
                 </Col>
                 <Col span={12}>
                   <Card>
-                    <Statistic title="Average R²" value={r2} />
-                  </Card>
-                </Col>
-              </Row>
-            </Col>
-            <Col span={24}>
-              <Row gutter={[8, 8]}>
-                <Col span={12}>
-                  <Card>
-                    <Statistic title="CPU MSE" value={mse_cpu} />
-                  </Card>
-                </Col>
-                <Col span={12}>
-                  <Card>
-                    <Statistic title="CPU R²" value={r2_cpu} />
+                    <Statistic title="Average R²" value={r2.toExponential(3)} />
                   </Card>
                 </Col>
               </Row>
@@ -59,12 +41,35 @@ const MlModelTrainingResponseDataView = ({
               <Row gutter={[8, 8]}>
                 <Col span={12}>
                   <Card>
-                    <Statistic title="Memory MSE" value={mse_mem} />
+                    <Statistic
+                      title="CPU MSE"
+                      value={mseCpu.toExponential(3)}
+                    />
                   </Card>
                 </Col>
                 <Col span={12}>
                   <Card>
-                    <Statistic title="Memory R²" value={r2_mem} />
+                    <Statistic title="CPU R²" value={r2Cpu.toExponential(3)} />
+                  </Card>
+                </Col>
+              </Row>
+            </Col>
+            <Col span={24}>
+              <Row gutter={[8, 8]}>
+                <Col span={12}>
+                  <Card>
+                    <Statistic
+                      title="Memory MSE"
+                      value={mseMem.toExponential(3)}
+                    />
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card>
+                    <Statistic
+                      title="Memory R²"
+                      value={r2Mem.toExponential(3)}
+                    />
                   </Card>
                 </Col>
               </Row>

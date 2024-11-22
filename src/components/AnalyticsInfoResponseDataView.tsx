@@ -28,13 +28,13 @@ const AnalyticsInfoResponseDataView = ({
   useEffect(() => {
     const percent = (cpuUsage / cpuLimit) * 100;
     const value = !isFinite(percent) || isNaN(percent) ? 0 : percent;
-    setPercentCPU(value);
+    setPercentCPU(Number(value.toExponential(3)));
   }, [cpuUsage, cpuLimit]);
 
   useEffect(() => {
     const percent = (memUsage / memLimit) * 100;
     const value = !isFinite(percent) || isNaN(percent) ? 0 : percent;
-    setPercentMem(value);
+    setPercentMem(Number(value.toExponential(3)));
   }, [memUsage, memLimit]);
 
   const descriptionItems = descriptionItemsInit.map(({ key, label }) => {
@@ -74,7 +74,7 @@ const AnalyticsInfoResponseDataView = ({
                   <Card>
                     <Statistic
                       title="CPU Load"
-                      value={nfLoad.cpuLoad}
+                      value={nfLoad.cpuLoad.toExponential(3)}
                       suffix="cores"
                     />
                   </Card>
@@ -83,7 +83,7 @@ const AnalyticsInfoResponseDataView = ({
                   <Card>
                     <Statistic
                       title="Memory Load"
-                      value={nfLoad.memLoad}
+                      value={nfLoad.memLoad.toExponential(3)}
                       suffix="KB"
                     />
                   </Card>
