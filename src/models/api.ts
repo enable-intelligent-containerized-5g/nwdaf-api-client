@@ -112,8 +112,8 @@ export interface MlModelTrainingResponseData {
 export interface Confidence {
   mse: number;
   r2: number;
-  mse_cpu: number;
-  r2_cpu: number;
-  mse_mem: number;
-  r2_mem: number;
+  mseCpu: number;
+  r2Cpu: number;
+  mseMem: number;
+  r2Mem: number;
 }

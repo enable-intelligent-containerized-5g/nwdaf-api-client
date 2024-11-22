@@ -11,7 +11,14 @@ const MlModelTrainingResponseDataView = ({
   ...props
 }: MlModelTrainingResponseDataViewProps) => {
   const { name, confidence, figure } = mlModelTraining;
-  const { mse, r2, mse_cpu, r2_cpu, mse_mem, r2_mem } = confidence;
+  const {
+    mse,
+    r2,
+    mseCpu: mse_cpu,
+    r2Cpu: r2_cpu,
+    mseMem: mse_mem,
+    r2Mem: r2_mem,
+  } = confidence;
 
   const tabs: TabsProps["items"] = [
     {
