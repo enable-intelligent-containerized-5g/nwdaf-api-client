@@ -31,7 +31,7 @@
       "disabled": true
     }
   ],
-  "nf_types": ["AMF", "AUSF", "NSSF", "PCF", "SMF", "UDM", "UDR"],
+  "nf_types": ["AMF", "AUSF", "NSSF", "PCF", "SMF", "UDM", "UDR", "NWDAF"],
   "analysis_times": [
     {
       "id_analysis_time": 1,

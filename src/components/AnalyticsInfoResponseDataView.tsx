@@ -1,41 +1,59 @@
-import {
-  Card,
-  Col,
-  Descriptions,
-  Progress,
-  Row,
-  Statistic,
-  Typography,
-} from "antd";
-import { ComponentProps, useEffect, useState } from "react";
+import { Col, Descriptions, Row, Tabs, TabsProps } from "antd";
+import { ComponentProps } from "react";
 import { twMerge } from "tailwind-merge";
 import { AnalyticsNfLoad } from "../models/api";
 import { DescriptionsItemType } from "antd/es/descriptions";
 import Title from "antd/es/typography/Title";
-
-const { Text } = Typography;
+import NfInfoStatisticComponent from "./NfInfoStatisticComponent";
+import ConfidenceComponent from "./ConfidenceComponent";
 
 const AnalyticsInfoResponseDataView = ({
   analyticsInfo,
   className,
   ...props
 }: AnalyticsInfoViewProps) => {
-  const { container, cpuUsage, nfType, memUsage, cpuLimit, memLimit, nfLoad } =
-    analyticsInfo;
-  const [percentCPU, setPercentCPU] = useState<number>(0);
-  const [percentMem, setPercentMem] = useState<number>(0);
+  const {
+    container,
+    cpuUsage,
+    nfType,
+    memUsage,
+    cpuLimit,
+    memLimit,
+    nfLoad,
+    confidence,
+  } = analyticsInfo;
+  const { mse, r2, mseCpu, r2Cpu, mseMem, r2Mem } = confidence;
 
-  useEffect(() => {
-    const percent = (cpuUsage / cpuLimit) * 100;
-    const value = !isFinite(percent) || isNaN(percent) ? 0 : percent;
-    setPercentCPU(Number(value.toExponential(3)));
-  }, [cpuUsage, cpuLimit]);
-
-  useEffect(() => {
-    const percent = (memUsage / memLimit) * 100;
-    const value = !isFinite(percent) || isNaN(percent) ? 0 : percent;
-    setPercentMem(Number(value.toExponential(3)));
-  }, [memUsage, memLimit]);
+  const tabs: TabsProps["items"] = [
+    {
+      key: "tab1",
+      label: "NF Info",
+      children: (
+        <NfInfoStatisticComponent
+          cpuUsage={cpuUsage}
+          memUsage={memUsage}
+          cpuLimit={cpuLimit}
+          memLimit={memLimit}
+          nfLoad={nfLoad}
+        />
+      ),
+    },
+    {
+      key: "tab2",
+      label: "Confidence",
+      disabled: confidence ? true : false,
+      children: (
+        <ConfidenceComponent
+          mse={mse}
+          r2={r2}
+          mseCpu={mseCpu}
+          r2Cpu={r2Cpu}
+          mseMem={mseMem}
+          r2Mem={r2Mem}
+        />
+      ),
+    },
+  ];
 
   const descriptionItems = descriptionItemsInit.map(({ key, label }) => {
     const value = analyticsInfo[label as keyof AnalyticsNfLoad];
@@ -64,80 +82,10 @@ const AnalyticsInfoResponseDataView = ({
               {container} - {nfType}
             </Title>
             <Descriptions items={descriptionItems} size={"small"} />
+            <Tabs defaultActiveKey="1" items={tabs} />
           </Row>
         </Col>
-        <Col span={24}>
-          <Row gutter={[8, 8]}>
-            <Col span={6}>
-              <Row gutter={[8, 8]}>
-                <Col span={24}>
-                  <Card>
-                    <Statistic
-                      title="CPU Load"
-                      value={nfLoad.cpuLoad.toExponential(3)}
-                      suffix="cores"
-                    />
-                  </Card>
-                </Col>
-                <Col span={24}>
-                  <Card>
-                    <Statistic
-                      title="Memory Load"
-                      value={nfLoad.memLoad.toExponential(3)}
-                      suffix="KB"
-                    />
-                  </Card>
-                </Col>
-              </Row>
-            </Col>
-            <Col span={18}>
-              <Row gutter={[16, 16]} justify={"center"}>
-                <Col span={12}>
-                  <Card>
-                    <Row justify={"center"} gutter={[4, 4]}>
-                      <Col span={24}>
-                        <Text type="secondary">CPU Usage</Text>
-                      </Col>
-                      <Col span={24}>
-                        <Row justify={"center"}>
-                          <Progress
-                            type="dashboard"
-                            percent={percentCPU}
-                            steps={8}
-                            strokeWidth={20}
-                            trailColor="rgba(0, 0, 0, 0.06)"
-                            size={160}
-                          />
-                        </Row>
-                      </Col>
-                    </Row>
-                  </Card>
-                </Col>
-                <Col span={12}>
-                  <Card>
-                    <Row justify={"center"} gutter={[4, 4]}>
-                      <Col span={24}>
-                        <Text type="secondary">Memory Usage</Text>
-                      </Col>
-                      <Col span={24}>
-                        <Row justify={"center"}>
-                          <Progress
-                            type="dashboard"
-                            percent={percentMem}
-                            steps={8}
-                            strokeWidth={20}
-                            trailColor="rgba(0, 0, 0, 0.06)"
-                            size={160}
-                          />
-                        </Row>
-                      </Col>
-                    </Row>
-                  </Card>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Col>
+        <Col span={24}></Col>
       </Row>
     </section>
   );

@@ -80,6 +80,7 @@ export interface AnalyticsNfLoad {
   memLimit: number;
   memUsage: number;
   nfLoad: NfLoad;
+  confidence: Confidence;
 }
 
 export interface AnalysisInfoResponseData {
