@@ -4,6 +4,8 @@ import Logo from "./components/Logo";
 import AnalyticsInfoView from "./pages/AnalyticsInfoView";
 import ModelGenerationView from "./pages/ModelGenerationView";
 import { GithubOutlined } from "@ant-design/icons";
+import { loadConfig } from "./http/getConfig"
+
 
 const { Content, Footer } = Layout;
 
@@ -17,6 +19,7 @@ const contentList: Record<string, ReactNode> = {
   tab2: <ModelGenerationView />,
 };
 
+
 const App: FC = () => {
   const [activeTabKey, setActiveTabKey] = useState<string>("tab1");
   const {
@@ -25,7 +28,13 @@ const App: FC = () => {
 
   const onTabChange = (key: string) => {
     setActiveTabKey(key);
+  };  
+
+  const initializeConfig = async () => {
+    await loadConfig(); // Load the config
   };
+  
+  initializeConfig();
 
   return (
     <div className="w-full min-h-screen flex justify-center items-center overflow-y-auto">

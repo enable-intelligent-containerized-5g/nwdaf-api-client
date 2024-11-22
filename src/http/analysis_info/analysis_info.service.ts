@@ -3,9 +3,17 @@ import {
   AnalysisInfoResponseData,
 } from "../../models/api";
 import ApiService from "../apiService";
+import { loadConfig } from "../getConfig"
 
-const host = "http://localhost:30080";
+let host = "http://127.0.0.1:30080";
 const path = "nnwdaf-analyticsinfo/v1";
+
+const config = await loadConfig();
+if (config?.nwdafAnlfUri) {
+  host = config.nwdafAnlfUri
+} else {
+  console.error("No found AnLF URI in configuration file");
+}
 
 async function analyticsInfoRequest(payload: AnalysisInfoRequestData) {
   try {

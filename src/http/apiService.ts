@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
-const DEFAULT_BASE_URL = "http://localhost:30080";
+const DEFAULT_BASE_URL = "http://127.0.0.1:30080";
 
 interface ApiServiceOptions<T> {
   endpoint: string;
