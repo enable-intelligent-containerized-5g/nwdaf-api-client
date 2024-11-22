@@ -1,23 +1,29 @@
-# Usa la imagen base de Node.js 20.13.1
-FROM node:20.13.1
+# Node.js image: 20.13.1
+FROM node:20.13.1 AS builder
 
-# Crea el directorio de trabajo en el contenedor
-WORKDIR /app
+WORKDIR /free5gc
 
-# Copia los archivos de configuración y dependencias
-COPY package*.json ./
+# Clone the repository
+RUN git clone --recursive -b v1.0.0 -j `nproc` https://github.com/enable-intelligent-containerized-5g/nwdaf-api-client ./nwdaf-api-client \
+    && cd nwdaf-api-client \
+    && npm install \
+    && npm run build
 
-# Instala las dependencias
-RUN npm install
 
-# Copia el resto del código fuente de la aplicación
-COPY . .
+# Build stage
+FROM node:20-alpine
+LABEL description="NWDAF-API-CLIENT v1.0.0"
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Construye la aplicación de React
-RUN npm run build
+WORKDIR /free5gc
 
-# Expone el puerto que usará la aplicación
+RUN mkdir dist/
+
+# Copy the dist files
+COPY --from=builder /free5gc/nwdaf-api-client/dist  /free5gc/dist/
+
+ENV npm_config_yes=true
+
+RUN npm install -g serve@14.2.4
+
 EXPOSE 3000
-
-# Define el comando para ejecutar la aplicación
-CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
