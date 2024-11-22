@@ -1,2 +1,5 @@
-nwdafAnlfUri: "http://anlf-nanlf:8000"
-nwdafMtlfUri: "http://mtlf-nmtlf:8000"
+# nwdafAnlfUri: "http://anlf-nanlf:8000"
+# nwdafMtlfUri: "http://mtlf-nmtlf:8000"
+
+nwdafAnlfUri: "http://127.0.0.1:30080"
+nwdafMtlfUri: "http://127.0.0.1:30081"

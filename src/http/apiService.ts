@@ -10,6 +10,8 @@ interface ApiServiceOptions<T> {
   baseURL?: string;
 }
 
+// axios.defaults.crossdomain = true;
+
 // Función de servicio API genérica que recibe y devuelve tipos
 async function ApiService<T = unknown, R = unknown>({
   endpoint,
@@ -24,10 +26,13 @@ async function ApiService<T = unknown, R = unknown>({
     baseURL,
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest",
       ...(token && { Authorization: `Bearer ${token}` }),
     },
     data,
   };
+
+  // axios.defaults.crossdomain = true;
 
   try {
     const response = await axios.request<R>(config);
