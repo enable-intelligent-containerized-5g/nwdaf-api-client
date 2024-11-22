@@ -3,9 +3,17 @@ import {
   MlModelTrainingResponseData,
 } from "../../models/api";
 import ApiService from "../apiService";
+import { loadConfig } from "../getConfig";
 
-const host = "http://localhost:30081";
+let host = "http://localhost:30081";
 const path = "nnwdaf-mlmodeltraining/v1";
+
+const config = await loadConfig();
+if (config?.nwdafMtlfUri) {
+  host = config.nwdafMtlfUri
+} else {
+  console.error("No found MTLF URI in configuration file");
+}
 
 async function mlModelTrainingRequest(payload: MlModelTrainingRequestData) {
   try {
