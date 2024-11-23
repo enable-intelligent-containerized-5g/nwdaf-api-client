@@ -14,7 +14,7 @@ export const loadConfig = async (): Promise<Config | null> => {
 
     try {
         // get the configfile
-        const configFile = import.meta.env.VITE_NWDAF_API_CLIENT_CONFIG_FILE || "apicfg.yaml";
+        const configFile = import.meta.env.VITE_NWDAF_API_CLIENT_CONFIG_FILE || "config/apiclientcfg.yaml";
         console.log("Config file:", configFile);
 
         // Carga el archivo YAML desde el directorio `public`

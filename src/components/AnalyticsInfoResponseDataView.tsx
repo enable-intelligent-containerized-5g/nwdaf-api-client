@@ -41,7 +41,7 @@ const AnalyticsInfoResponseDataView = ({
     {
       key: "tab2",
       label: "Confidence",
-      disabled: confidence ? true : false,
+      disabled: confidence ? false : true,
       children: (
         <ConfidenceComponent
           mse={mse}
