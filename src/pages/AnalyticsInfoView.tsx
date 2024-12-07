@@ -94,14 +94,12 @@ const AnalyticsInfoView = () => {
     const currentTime = new Date();
 
     if (analysisTime === "statistic") {
-      console.log("statistic");
       const pastTime = new Date(currentTime.getTime() - defaultTime * 1000);
       const valueTimeFormatted = pastTime.toISOString();
       const currentTimeFormatted = currentTime.toISOString();
       startTime = valueTimeFormatted;
       endTime = currentTimeFormatted;
     } else {
-      console.log("prediction");
       const futureTime = new Date(currentTime.getTime() + defaultTime * 1000);
       const valueTimeFormatted = futureTime.toISOString();
       const currentTimeFormatted = currentTime.toISOString();
@@ -140,8 +138,7 @@ const AnalyticsInfoView = () => {
         setLoading(false);
       })
       .catch((error) => {
-        const { detail: message } = error.response.data;
-        messageApi.error(`Error to analysis NFs: ${message}`);
+        messageApi.error(`${error}`);
       });
   };
 

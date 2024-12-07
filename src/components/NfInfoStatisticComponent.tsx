@@ -1,9 +1,10 @@
-import { Card, Col, Progress, Row, Statistic, Typography } from "antd";
+import { Row, Col } from "antd";
 import { ComponentProps } from "react";
 import { NfLoad } from "../models/api";
 import { twMerge } from "tailwind-merge";
-
-const { Text } = Typography;
+import StatisticCard from "./StatisticCard";
+import ProgressCard from "./ProgressCard";
+import MetricCard from "./MetricCard"; // Importamos el nuevo componente reutilizable
 
 const NfInfoStatisticComponent = ({
   className,
@@ -12,162 +13,115 @@ const NfInfoStatisticComponent = ({
   cpuLimit,
   memLimit,
   nfLoad,
+  throughput,
   ...props
 }: NfInfoStatisticComponentProps) => {
   const formatBytes = (bytes: number): { value: string; unit: string } => {
-    if (bytes === 0)
-      return {
-        value: "0",
-        unit: "B",
-      };
+    if (bytes === 0) return { value: "0", unit: "B" };
 
     const units = ["B", "KB", "MB", "GB", "TB"];
     const k = 1024;
-
-    // Determina la unidad más adecuada
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    // Calcula el valor convertido
     const value = bytes / Math.pow(k, i);
 
-    // Devuelve el valor con 2 decimales y la unidad correspondiente
-    return {
-      value: value.toFixed(2),
-      unit: units[i],
-    };
+    return { value: value.toFixed(2), unit: units[i] };
   };
 
   const formatCores = (cores: number): { value: string; unit: string } => {
-    if (cores === 0) {
-      return {
-        value: "0",
-        unit: "Cores",
-      };
-    }
+    if (cores === 0) return { value: "0", unit: "Cores" };
 
-    // Definimos las unidades posibles
     const units = ["µCores", "mCores", "Cores"];
     let value: number;
     let unit: string;
 
     if (cores < 0.001) {
-      // Convertir a Microcores (µCores)
       value = cores * 1e6;
       unit = units[0];
     } else if (cores < 1) {
-      // Convertir a Milicores (mCores)
       value = cores * 1000;
       unit = units[1];
     } else {
-      // Mostrar en Cores completos
       value = cores;
       unit = units[2];
     }
 
-    return {
-      value: value.toFixed(2),
-      unit,
-    };
+    return { value: value.toFixed(2), unit };
   };
 
-  // Función para aproximar el valor como porcentaje
-  const approximateToPercentage = (num: number) => {
-    // Redondeamos según el valor del número
-    return (num * 100).toFixed(2); // Si es menor que 1%, lo mostramos como entero
+  const approximateToPercentage = (num: number) => (num * 100).toFixed(2);
+
+  const statistics = [
+    {
+      title: "CPU Usage",
+      value: formatCores(cpuUsage).value,
+      unit: formatCores(cpuUsage).unit,
+    },
+    {
+      title: "Memory Usage",
+      value: formatBytes(memUsage).value,
+      unit: formatBytes(memUsage).unit,
+    },
+    {
+      title: "CPU Limit",
+      value: formatCores(cpuLimit).value,
+      unit: formatCores(cpuLimit).unit,
+    },
+    {
+      title: "Memory Limit",
+      value: formatBytes(memLimit).value,
+      unit: formatBytes(memLimit).unit,
+    },
+  ];
+
+  const valueFormatterThroughput = (value: number) => {
+    if (value === 0) return "0";
+    const units = ["bps", "Kbps", "Mbps", "Gbps"];
+    const k = 1024;
+    const i = Math.floor(Math.log(value) / Math.log(k));
+    const formattedValue = value / Math.pow(k, i);
+    return `${formattedValue.toFixed(2)} ${units[i]}`;
   };
 
   return (
     <div className={twMerge(className, "")} {...props}>
       <Row gutter={[8, 8]}>
         <Col span={24}>
-          <Row gutter={[8, 8]}>
+          <Row gutter={[16, 16]} justify={"center"}>
             <Col span={12}>
-              <Card>
-                <Statistic
-                  title="CPU Usage"
-                  value={formatCores(cpuUsage).value}
-                  suffix={formatCores(cpuUsage).unit}
-                />
-              </Card>
-            </Col>
-            <Col span={12}>
-              <Card>
-                <Statistic
-                  title="Memory Usage"
-                  value={formatBytes(memUsage).value}
-                  suffix={formatBytes(memUsage).unit}
-                />
-              </Card>
+              <MetricCard
+                title="Throughput"
+                value={throughput}
+                valueFormatter={valueFormatterThroughput}
+              />
             </Col>
           </Row>
         </Col>
         <Col span={24}>
           <Row gutter={[8, 8]}>
-            <Col span={12}>
-              <Card>
-                <Statistic
-                  title="CPU Limit"
-                  value={formatCores(cpuLimit).value}
-                  suffix={formatCores(cpuLimit).unit}
+            {statistics.map((stat, index) => (
+              <Col span={12} key={index}>
+                <StatisticCard
+                  title={stat.title}
+                  value={stat.value}
+                  unit={stat.unit}
                 />
-              </Card>
-            </Col>
-            <Col span={12}>
-              <Card>
-                <Statistic
-                  title="Memory Limit"
-                  value={formatBytes(memLimit).value}
-                  suffix={formatBytes(memLimit).unit}
-                />
-              </Card>
-            </Col>
+              </Col>
+            ))}
           </Row>
         </Col>
         <Col span={24}>
           <Row gutter={[16, 16]} justify={"center"}>
             <Col span={12}>
-              <Card>
-                <Row justify={"center"} gutter={[4, 4]}>
-                  <Col span={24}>
-                    <Text type="secondary">CPU Load</Text>
-                  </Col>
-                  <Col span={24}>
-                    <Row justify={"center"}>
-                      <Progress
-                        type="dashboard"
-                        percent={Number(
-                          approximateToPercentage(nfLoad.cpuLoad),
-                        )}
-                        strokeWidth={10}
-                        trailColor="rgba(0, 0, 0, 0.06)"
-                        size={160}
-                      />
-                    </Row>
-                  </Col>
-                </Row>
-              </Card>
+              <ProgressCard
+                title="CPU Load"
+                percent={Number(approximateToPercentage(nfLoad.cpuLoad))}
+              />
             </Col>
             <Col span={12}>
-              <Card>
-                <Row justify={"center"} gutter={[4, 4]}>
-                  <Col span={24}>
-                    <Text type="secondary">Memory Load</Text>
-                  </Col>
-                  <Col span={24}>
-                    <Row justify={"center"}>
-                      <Progress
-                        type="dashboard"
-                        percent={Number(
-                          approximateToPercentage(nfLoad.memLoad),
-                        )}
-                        strokeWidth={10}
-                        trailColor="rgba(0, 0, 0, 0.06)"
-                        size={160}
-                      />
-                    </Row>
-                  </Col>
-                </Row>
-              </Card>
+              <ProgressCard
+                title="Memory Load"
+                percent={Number(approximateToPercentage(nfLoad.memLoad))}
+              />
             </Col>
           </Row>
         </Col>
@@ -182,6 +136,7 @@ type NfInfoStatisticComponentProps = ComponentProps<"div"> & {
   cpuLimit: number;
   memLimit: number;
   nfLoad: NfLoad;
+  throughput: number;
 };
 
 export default NfInfoStatisticComponent;
