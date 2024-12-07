@@ -11,8 +11,8 @@ const ConfidenceComponent = ({
   r2Cpu,
   mseMem,
   r2Mem,
-  mseThroughput,
-  r2Throughput,
+  mseThrpt,
+  r2Thrpt,
   ...props
 }: ConfidenceComponentProps) => {
   const statistics = [
@@ -22,8 +22,8 @@ const ConfidenceComponent = ({
     { title: "CPU R²", value: r2Cpu?.toFixed(3) },
     { title: "Memory MSE", value: mseMem?.toExponential(3) },
     { title: "Memory R²", value: r2Mem?.toFixed(3) },
-    { title: "Throughput MSE", value: mseThroughput?.toExponential(3) },
-    { title: "Throughput R²", value: r2Throughput?.toFixed(3) },
+    { title: "Throughput MSE", value: mseThrpt?.toExponential(3) },
+    { title: "Throughput R²", value: r2Thrpt?.toFixed(3) },
   ];
 
   // Validamos si hay datos disponibles
