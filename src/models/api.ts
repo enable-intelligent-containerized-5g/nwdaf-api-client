@@ -98,7 +98,7 @@ export interface MlModelTrainingRequestData {
   startTime: string;
   targetPeriod: string;
   newDataset: boolean;
-  file: string | null;
+  file: { data: string | null; name: string | null } | null;
 }
 
 export interface MlModelTrainingResponseData {
