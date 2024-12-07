@@ -87,7 +87,10 @@ const ModelGenerationView = () => {
       targetPeriod,
       startTime,
       newDataset,
-      file: base64File,
+      file: {
+        data: base64File,
+        name: file ? file.name : null,
+      },
     };
 
     mlModelTrainingRequest(mlModelTrainingResquestData)
