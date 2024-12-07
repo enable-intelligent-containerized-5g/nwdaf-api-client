@@ -52,7 +52,7 @@ async function ApiService<T = unknown, R = unknown>({
       } else {
         // Handling other server errors with a response (e.g., 404, 500)
         console.error("Server response error:", error.response);
-        throw new Error(`${error.response?.data?.message || error.message}`);
+        throw `${error.response?.data?.detail || error.message}`;
       }
     } else {
       // If it's not an AxiosError, we just throw the error as is
