@@ -23,7 +23,7 @@ const AnalyticsInfoResponseDataView = ({
     nfLoad,
     confidence,
   } = analyticsInfo;
-  const { mse, r2, mseCpu, r2Cpu, mseMem, r2Mem, mseThroughput, r2Throughput } =
+  const { mse, r2, mseCpu, r2Cpu, mseMem, r2Mem, mseThrpt, r2Thrpt } =
     confidence;
 
   const hasValidConfidence = Object.values({
@@ -33,8 +33,8 @@ const AnalyticsInfoResponseDataView = ({
     r2Cpu,
     mseMem,
     r2Mem,
-    mseThroughput,
-    r2Throughput,
+    mseThrpt,
+    r2Thrpt,
   }).some((value) => value !== null && value !== undefined && value !== 0);
 
   const tabs: TabsProps["items"] = [
@@ -66,8 +66,8 @@ const AnalyticsInfoResponseDataView = ({
                 r2Cpu={r2Cpu}
                 mseMem={mseMem}
                 r2Mem={r2Mem}
-                mseThroughput={mseThroughput}
-                r2Throughput={r2Throughput}
+                mseThrpt={mseThrpt}
+                r2Thrpt={r2Thrpt}
               />
             ),
           },

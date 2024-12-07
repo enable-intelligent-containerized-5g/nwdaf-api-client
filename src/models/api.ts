@@ -119,6 +119,6 @@ export interface Confidence {
   r2Cpu: number;
   mseMem: number;
   r2Mem: number;
-  mseThroughput: number;
-  r2Throughput: number;
+  mseThrpt: number;
+  r2Thrpt: number;
 }
