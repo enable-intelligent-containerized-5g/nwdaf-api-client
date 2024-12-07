@@ -19,10 +19,23 @@ const AnalyticsInfoResponseDataView = ({
     memUsage,
     cpuLimit,
     memLimit,
+    throughput,
     nfLoad,
     confidence,
   } = analyticsInfo;
-  const { mse, r2, mseCpu, r2Cpu, mseMem, r2Mem } = confidence;
+  const { mse, r2, mseCpu, r2Cpu, mseMem, r2Mem, mseThroughput, r2Throughput } =
+    confidence;
+
+  const hasValidConfidence = Object.values({
+    mse,
+    r2,
+    mseCpu,
+    r2Cpu,
+    mseMem,
+    r2Mem,
+    mseThroughput,
+    r2Throughput,
+  }).some((value) => value !== null && value !== undefined && value !== 0);
 
   const tabs: TabsProps["items"] = [
     {
@@ -35,24 +48,31 @@ const AnalyticsInfoResponseDataView = ({
           cpuLimit={cpuLimit}
           memLimit={memLimit}
           nfLoad={nfLoad}
+          throughput={throughput}
         />
       ),
     },
-    {
-      key: "tab2",
-      label: "Confidence",
-      disabled: confidence ? false : true,
-      children: (
-        <ConfidenceComponent
-          mse={mse}
-          r2={r2}
-          mseCpu={mseCpu}
-          r2Cpu={r2Cpu}
-          mseMem={mseMem}
-          r2Mem={r2Mem}
-        />
-      ),
-    },
+    ...(hasValidConfidence
+      ? [
+          {
+            key: "tab2",
+            label: "Confidence",
+            children: (
+              <ConfidenceComponent
+                className="width-full"
+                mse={mse}
+                r2={r2}
+                mseCpu={mseCpu}
+                r2Cpu={r2Cpu}
+                mseMem={mseMem}
+                r2Mem={r2Mem}
+                mseThroughput={mseThroughput}
+                r2Throughput={r2Throughput}
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   const descriptionItems = descriptionItemsInit.map(({ key, label }) => {
@@ -82,7 +102,9 @@ const AnalyticsInfoResponseDataView = ({
               {container} - {nfType}
             </Title>
             <Descriptions items={descriptionItems} size={"small"} />
-            <Tabs defaultActiveKey="1" items={tabs} />
+            <Col span={"24"}>
+              <Tabs defaultActiveKey="1" items={tabs} />
+            </Col>
           </Row>
         </Col>
         <Col span={24}></Col>

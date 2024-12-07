@@ -79,6 +79,7 @@ export interface AnalyticsNfLoad {
   cpuUsage: number;
   memLimit: number;
   memUsage: number;
+  throughput: number;
   nfLoad: NfLoad;
   confidence: Confidence;
 }
@@ -97,6 +98,7 @@ export interface MlModelTrainingRequestData {
   startTime: string;
   targetPeriod: string;
   newDataset: boolean;
+  file: File | null;
 }
 
 export interface MlModelTrainingResponseData {
@@ -117,4 +119,6 @@ export interface Confidence {
   r2Cpu: number;
   mseMem: number;
   r2Mem: number;
+  mseThroughput: number;
+  r2Throughput: number;
 }

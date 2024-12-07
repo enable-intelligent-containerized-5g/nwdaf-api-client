@@ -8,13 +8,11 @@ import { loadConfig } from "../getConfig";
 let host = "http://localhost:30081";
 const path = "nnwdaf-mlmodeltraining/v1";
 
-
-
 async function mlModelTrainingRequest(payload: MlModelTrainingRequestData) {
   try {
     const config = await loadConfig();
     if (config?.nwdafMtlfUri) {
-      host = config.nwdafMtlfUri
+      host = config.nwdafMtlfUri;
     } else {
       console.error("No found MTLF URI in configuration file");
     }
@@ -23,6 +21,9 @@ async function mlModelTrainingRequest(payload: MlModelTrainingRequestData) {
       endpoint: `${host}/${path}/mlmodeltraining/request`,
       method: "POST",
       data: payload,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     return response.data as MlModelTrainingResponseData;
   } catch (error) {

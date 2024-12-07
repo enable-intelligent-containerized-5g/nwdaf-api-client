@@ -24,10 +24,11 @@ import {
   MlModelTrainingRequestData,
   MlModelTrainingResponseData,
 } from "../models/api";
-import { mlModelTrainingRequest } from "../http/ml_model_training/ml_model_training";
+import { mlModelTrainingRequest } from "../http/ml_model_training/ml_model_training.service";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import MlModelTrainingResponseDataView from "../components/MlModelTrainingResponseDataView";
+import FileUpload from "../components/FileUpdate";
 
 const schema = yup.object().shape({
   eventId: yup.string().required("This field is required"),
@@ -50,6 +51,7 @@ const ModelGenerationView = () => {
     useState<MlModelTrainingResponseData>({} as MlModelTrainingResponseData);
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [file, setFile] = useState<File | null>(null); // Para almacenar el archivo cargado
 
   const {
     handleSubmit,
@@ -58,6 +60,10 @@ const ModelGenerationView = () => {
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
+
+  const handleFileChange = (file: File) => {
+    setFile(file);
+  };
 
   const onFinish = async (mlModelTrainingForm: object) => {
     setLoading(true);
@@ -69,6 +75,7 @@ const ModelGenerationView = () => {
       targetPeriod,
       startTime,
       newDataset,
+      file,
     };
 
     mlModelTrainingRequest(mlModelTrainingResquestData)
@@ -246,6 +253,14 @@ const ModelGenerationView = () => {
                       </Radio.Group>
                     )}
                   />
+                </Item>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col span={24}>
+                <Item label="Upload CSV (optional)">
+                  <FileUpload onFileChange={handleFileChange} />
                 </Item>
               </Col>
             </Row>
