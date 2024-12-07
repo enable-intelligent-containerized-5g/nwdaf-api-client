@@ -21,9 +21,6 @@ async function mlModelTrainingRequest(payload: MlModelTrainingRequestData) {
       endpoint: `${host}/${path}/mlmodeltraining/request`,
       method: "POST",
       data: payload,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
     });
     return response.data as MlModelTrainingResponseData;
   } catch (error) {
