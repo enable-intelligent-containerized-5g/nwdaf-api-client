@@ -2,6 +2,7 @@ import {
   AccuracyLevel,
   AnalysisMetric,
   AnalysisTime,
+  DatasetOrigin,
   DefaultTime,
   TypeInfoFilter,
 } from "./models/api";
@@ -14,4 +15,5 @@ export const typedData: {
   analysis_times: AnalysisTime[];
   default_times: DefaultTime[];
   accuracy_levels: AccuracyLevel[];
+  dataset_origin: DatasetOrigin[];
 } = rawData;

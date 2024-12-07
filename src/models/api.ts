@@ -122,3 +122,10 @@ export interface Confidence {
   mseThrpt: number;
   r2Thrpt: number;
 }
+
+export interface DatasetOrigin {
+  id_dataset_origin: number;
+  name: string;
+  code: string;
+  disabled: boolean;
+}
