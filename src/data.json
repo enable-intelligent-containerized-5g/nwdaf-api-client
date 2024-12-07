@@ -82,5 +82,19 @@
       "name": "High",
       "code": "HIGH"
     }
+  ],
+  "dataset_origin": [
+    {
+      "id_dataset_origin": 1,
+      "name": "Packet capture module",
+      "code": "packet_capture_module",
+      "disabled": false
+    },
+    {
+      "id_dataset_origin": 2,
+      "name": "Uploading file",
+      "code": "uploading_file",
+      "disabled": false
+    }
   ]
 }

@@ -29,13 +29,16 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import MlModelTrainingResponseDataView from "../components/MlModelTrainingResponseDataView";
 import FileUpload from "../components/FileUpdate";
+import { useDatasetOrigin } from "../hooks/useDatasetOrigin";
 
 const schema = yup.object().shape({
+  datasetOrigin: yup.string().required("This field is required"),
   eventId: yup.string().required("This field is required"),
   nfType: yup.string().required("This field is required"),
   startTime: yup.string().required("This field is required"),
   targetPeriod: yup.number().required("This field is required"),
   newDataset: yup.boolean().required("This field is required"),
+  file: yup.mixed(),
 });
 
 const { Item } = Form;
@@ -43,7 +46,8 @@ const { Text } = Typography;
 
 const ModelGenerationView = () => {
   const [form] = Form.useForm();
-  const [validationSchema] = useState(schema);
+  const [validationSchema, setValidationSchema] = useState(schema);
+  const { optionsDatasetOrigin } = useDatasetOrigin();
   const { optionsAnalysisMetrics } = useAnalisysMetric();
   const { optionsNfTypes } = useNfType();
   const { optionsDefaultTime } = useDefaultTime();
@@ -52,12 +56,18 @@ const ModelGenerationView = () => {
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [file, setFile] = useState<File | null>(null); // Para almacenar el archivo cargado
+  const [showOptionsFile, setShowOptionsFile] = useState(false);
 
   const {
     handleSubmit,
     control,
     formState: { errors },
+    setValue,
+    trigger,
   } = useForm({
+    defaultValues: {
+      datasetOrigin: "packet_capture_module",
+    },
     resolver: yupResolver(validationSchema),
   });
 
@@ -118,6 +128,65 @@ const ModelGenerationView = () => {
           xl={6}
         >
           <Form form={form} onFinish={handleSubmit(onFinish)} layout="vertical">
+            <Row>
+              <Col flex={"auto"}>
+                <Item
+                  label="Dataset origin"
+                  validateStatus={errors.datasetOrigin ? "error" : ""}
+                  help={errors.datasetOrigin?.message}
+                >
+                  <Controller
+                    name="datasetOrigin"
+                    control={control}
+                    render={({ field }) => {
+                      const handleChange = (value: string) => {
+                        let newSchema = schema;
+                        if (value === "packet_capture_module") {
+                          newSchema = schema.shape({
+                            startTime: yup
+                              .string()
+                              .required("This field is required"),
+                            newDataset: yup
+                              .boolean()
+                              .required("This field is required"),
+                            file: yup.mixed().notRequired(),
+                          });
+                          setValue("file", null, { shouldValidate: false });
+                          setFile(null);
+                          setShowOptionsFile(false);
+                        } else {
+                          newSchema = schema.shape({
+                            startTime: yup.string().notRequired(),
+                            newDataset: yup.boolean().notRequired(),
+                            file: yup
+                              .mixed()
+                              .required("This field is required"),
+                          });
+                          setValue("startTime", "");
+                          setValue("newDataset", false);
+                          setShowOptionsFile(true);
+                        }
+
+                        setValidationSchema(newSchema);
+                        trigger();
+                        field.onChange(value);
+                      };
+
+                      return (
+                        <Select
+                          {...field}
+                          options={optionsDatasetOrigin}
+                          placeholder="Select one"
+                          allowClear
+                          onChange={handleChange}
+                        ></Select>
+                      );
+                    }}
+                  />
+                </Item>
+              </Col>
+            </Row>
+
             <Row>
               <Col flex={"auto"}>
                 <Item
@@ -194,91 +263,114 @@ const ModelGenerationView = () => {
               </Col>
             </Row>
 
-            <Row>
-              <Col flex={"auto"}>
-                <Item
-                  label="Start Time"
-                  validateStatus={errors.startTime ? "error" : ""}
-                  help={errors.startTime?.message}
-                >
-                  <Controller
-                    name="startTime"
-                    control={control}
-                    render={({ field }) => (
-                      <Space>
-                        <DatePicker
-                          onChange={(date) => {
-                            const time = field.value
-                              ? new Date(field.value)
-                              : new Date();
-                            const combinedDate = new Date(
-                              date.year(),
-                              date.month(),
-                              date.date(),
-                              time.getHours(),
-                              time.getMinutes(),
-                            );
-                            const isoString = combinedDate.toISOString();
-                            field.onChange(isoString);
+            {showOptionsFile ? (
+              <Row>
+                <Col flex={"auto"}>
+                  <Item
+                    label="Upload CSV"
+                    validateStatus={errors.file ? "error" : ""}
+                    help={
+                      errors.file?.message
+                        ? String(errors.file.message)
+                        : undefined
+                    }
+                  >
+                    <Controller
+                      name="file"
+                      control={control}
+                      render={({ field }) => (
+                        <FileUpload
+                          onFileChange={(file) => {
+                            handleFileChange(file);
+                            field.onChange(file);
                           }}
                         />
-                        <TimePicker
-                          onChange={(time) => {
-                            if (time) {
-                              const date = field.value
-                                ? new Date(field.value)
-                                : new Date();
-                              const combinedDate = new Date(
-                                date.getFullYear(),
-                                date.getMonth(),
-                                date.getDate(),
-                                time.hour(),
-                                time.minute(),
-                              );
-                              const isoString = combinedDate.toISOString();
-                              field.onChange(isoString);
-                            }
-                          }}
-                        />
-                      </Space>
-                    )}
-                  />
-                </Item>
-              </Col>
-            </Row>
+                      )}
+                    ></Controller>
+                  </Item>
+                </Col>
+              </Row>
+            ) : (
+              <>
+                <Row>
+                  <Col flex={"auto"}>
+                    <Item
+                      label="Start Time"
+                      validateStatus={errors.startTime ? "error" : ""}
+                      help={errors.startTime?.message}
+                    >
+                      <Controller
+                        name="startTime"
+                        control={control}
+                        render={({ field }) => (
+                          <Space>
+                            <DatePicker
+                              onChange={(date) => {
+                                const time = field.value
+                                  ? new Date(field.value)
+                                  : new Date();
+                                const combinedDate = new Date(
+                                  date.year(),
+                                  date.month(),
+                                  date.date(),
+                                  time.getHours(),
+                                  time.getMinutes(),
+                                );
+                                const isoString = combinedDate.toISOString();
+                                field.onChange(isoString);
+                              }}
+                            />
+                            <TimePicker
+                              onChange={(time) => {
+                                if (time) {
+                                  const date = field.value
+                                    ? new Date(field.value)
+                                    : new Date();
+                                  const combinedDate = new Date(
+                                    date.getFullYear(),
+                                    date.getMonth(),
+                                    date.getDate(),
+                                    time.hour(),
+                                    time.minute(),
+                                  );
+                                  const isoString = combinedDate.toISOString();
+                                  field.onChange(isoString);
+                                }
+                              }}
+                            />
+                          </Space>
+                        )}
+                      />
+                    </Item>
+                  </Col>
+                </Row>
 
-            <Row>
-              <Col flex={"auto"}>
-                <Item
-                  label="New dataset"
-                  validateStatus={errors.newDataset ? "error" : ""}
-                  help={errors.newDataset?.message}
-                >
-                  <Controller
-                    name="newDataset"
-                    control={control}
-                    render={({ field }) => (
-                      <Radio.Group
-                        {...field}
-                        buttonStyle="solid"
-                        optionType="button"
-                      >
-                        <Radio value="true">Yes</Radio>
-                        <Radio value="false">No</Radio>
-                      </Radio.Group>
-                    )}
-                  />
-                </Item>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col span={24}>
-                <Item label="Upload CSV (optional)">
-                  <FileUpload onFileChange={handleFileChange} />
-                </Item>
-              </Col>
-            </Row>
+                <Row>
+                  <Col flex={"auto"}>
+                    <Item
+                      label="New dataset"
+                      validateStatus={errors.newDataset ? "error" : ""}
+                      help={errors.newDataset?.message}
+                    >
+                      <Controller
+                        name="newDataset"
+                        control={control}
+                        render={({ field }) => (
+                          <Radio.Group
+                            {...field}
+                            buttonStyle="solid"
+                            optionType="button"
+                          >
+                            <Radio value="true">Yes</Radio>
+                            <Radio value="false">No</Radio>
+                          </Radio.Group>
+                        )}
+                      />
+                    </Item>
+                  </Col>
+                </Row>
+              </>
+            )}
 
             <Row>
               <Col flex={"auto"}>
