@@ -61,6 +61,15 @@ const ModelGenerationView = () => {
     resolver: yupResolver(validationSchema),
   });
 
+  const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileChange = (file: File) => {
     setFile(file);
   };
@@ -69,13 +78,16 @@ const ModelGenerationView = () => {
     setLoading(true);
     const { eventId, nfType, targetPeriod, newDataset, startTime } =
       mlModelTrainingForm as MlModelTrainingForm;
+
+    const base64File = file ? await readFileAsBase64(file) : null;
+
     const mlModelTrainingResquestData: MlModelTrainingRequestData = {
       nfType,
       eventId,
       targetPeriod,
       startTime,
       newDataset,
-      file,
+      file: base64File,
     };
 
     mlModelTrainingRequest(mlModelTrainingResquestData)
