@@ -162,8 +162,9 @@ const ModelGenerationView = () => {
                               .mixed()
                               .required("This field is required"),
                           });
-                          setValue("startTime", "");
-                          setValue("newDataset", false);
+                          const currentTime = new Date();
+                          setValue("startTime", currentTime.toISOString());
+                          setValue("newDataset", true);
                           setShowOptionsFile(true);
                         }
 
