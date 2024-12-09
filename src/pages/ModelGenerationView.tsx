@@ -58,6 +58,25 @@ const ModelGenerationView = () => {
   const [file, setFile] = useState<File | null>(null); // Para almacenar el archivo cargado
   const [showOptionsFile, setShowOptionsFile] = useState(false);
 
+  // useEffect(() => {
+  //   let newSchema = schema;
+  //   newSchema = schema.shape({
+  //     startTime: yup
+  //       .string()
+  //       .required("This field is required"),
+  //     newDataset: yup
+  //       .boolean()
+  //       .required("This field is required"),
+  //     // file: yup.mixed().notRequired(),
+  //   });
+  //   // setValue("file", null, { shouldValidate: false });
+  //   // setFile(null);
+  //   setShowOptionsFile(false);
+
+  //   setValidationSchema(newSchema);
+  //   trigger();
+  // }, [])
+
   const {
     handleSubmit,
     control,
@@ -155,6 +174,7 @@ const ModelGenerationView = () => {
                           setFile(null);
                           setShowOptionsFile(false);
                         } else {
+                          // @ts-ignore
                           newSchema = schema.shape({
                             startTime: yup.string().notRequired(),
                             newDataset: yup.boolean().notRequired(),
@@ -285,7 +305,7 @@ const ModelGenerationView = () => {
                             handleFileChange(file);
                             field.onChange(file);
                           }}
-                          onFileRemove={()=>{
+                          onFileRemove={() => {
                             handleFileChange(null);
                             field.onChange(null);
                           }}
