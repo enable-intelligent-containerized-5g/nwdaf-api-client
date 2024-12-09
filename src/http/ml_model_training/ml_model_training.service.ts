@@ -24,7 +24,7 @@ async function mlModelTrainingRequest(payload: MlModelTrainingRequestData) {
     });
     return response.data as MlModelTrainingResponseData;
   } catch (error) {
-    console.error("Error en la solicitud:", error);
+    // console.error("Error in the request:", error);
     throw error;
   }
 }

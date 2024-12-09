@@ -86,7 +86,7 @@
   "dataset_origin": [
     {
       "id_dataset_origin": 1,
-      "name": "Packet capture module",
+      "name": "Packet Capture Module",
       "code": "packet_capture_module",
       "disabled": false
     },

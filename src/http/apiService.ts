@@ -42,6 +42,7 @@ async function ApiService<T = unknown, R = unknown>({
     return response;
   } catch (error) {
     if (error instanceof AxiosError) {
+      // console.log(error)
       // Customization for network errors
       if (!error.response) {
         // Handling "Network Error" when there is no response from the server

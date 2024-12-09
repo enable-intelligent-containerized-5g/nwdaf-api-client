@@ -28,7 +28,7 @@ import { mlModelTrainingRequest } from "../http/ml_model_training/ml_model_train
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import MlModelTrainingResponseDataView from "../components/MlModelTrainingResponseDataView";
-import FileUpload from "../components/FileUpdate";
+import FileUpload from "../components/FileUpload";
 import { useDatasetOrigin } from "../hooks/useDatasetOrigin";
 
 const schema = yup.object().shape({
@@ -80,7 +80,7 @@ const ModelGenerationView = () => {
     });
   };
 
-  const handleFileChange = (file: File) => {
+  const handleFileChange = (file: File | null) => {
     setFile(file);
   };
 
@@ -111,8 +111,8 @@ const ModelGenerationView = () => {
         setLoading(false);
       })
       .catch((error) => {
-        const { detail: message } = error.response.data;
-        messageApi.error(`Error to analysis NFs: ${message}`);
+        // console.log("error", error);
+        messageApi.error(`${error}`);
       });
   };
 
@@ -284,6 +284,10 @@ const ModelGenerationView = () => {
                           onFileChange={(file) => {
                             handleFileChange(file);
                             field.onChange(file);
+                          }}
+                          onFileRemove={()=>{
+                            handleFileChange(null);
+                            field.onChange(null);
                           }}
                         />
                       )}
