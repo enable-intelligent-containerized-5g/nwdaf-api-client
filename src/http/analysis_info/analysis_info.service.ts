@@ -24,7 +24,7 @@ async function analyticsInfoRequest(payload: AnalysisInfoRequestData) {
     });
     return response.data as AnalysisInfoResponseData;
   } catch (error) {
-    console.error("Error en la solicitud:", error);
+    // console.error("Error in the request:", error);
     throw error;
   }
 }

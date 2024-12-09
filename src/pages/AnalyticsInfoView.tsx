@@ -138,7 +138,7 @@ const AnalyticsInfoView = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.log("error", error);
+        // console.log("error", error);
         messageApi.error(`${error}`);
       });
   };

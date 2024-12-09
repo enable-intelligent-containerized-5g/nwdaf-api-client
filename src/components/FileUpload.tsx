@@ -5,9 +5,10 @@ import React from "react";
 
 interface FileUploadProps {
   onFileChange: (file: File) => void;
+  onFileRemove: () => void
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileChange }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, onFileRemove }) => {
   const handleFileChange = (info: UploadChangeParam) => {
     if (info.file.status === "done") {
       message.success(`${info.file.name} file uploaded successfully`);
@@ -24,6 +25,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileChange }) => {
       }}
       onChange={handleFileChange}
       accept=".csv"
+      maxCount={1}
+      onRemove={() => {
+        onFileRemove()
+      }}
     >
       <Button icon={<UploadOutlined />}>Upload CSV</Button>
     </Upload>
