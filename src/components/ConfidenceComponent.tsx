@@ -16,13 +16,13 @@ const ConfidenceComponent = ({
   ...props
 }: ConfidenceComponentProps) => {
   const statistics = [
-    { title: "Average MSE", value: mse?.toExponential(3) },
+    { title: "Average RMSE", value:  Math.sqrt(parseFloat(mse?.toExponential(3))) },
     { title: "Average R²", value: r2?.toFixed(3) },
-    { title: "CPU MSE", value: mseCpu?.toExponential(3) },
+    { title: "CPU RMSE", value: Math.sqrt(parseFloat(mseCpu?.toExponential(3))) },
     { title: "CPU R²", value: r2Cpu?.toFixed(3) },
-    { title: "Memory MSE", value: mseMem?.toExponential(3) },
+    { title: "Memory RMSE", value: Math.sqrt(parseFloat(mseMem?.toExponential(3))) },
     { title: "Memory R²", value: r2Mem?.toFixed(3) },
-    { title: "Throughput MSE", value: mseThrpt?.toExponential(3) },
+    { title: "Throughput RMSE", value: Math.sqrt(parseFloat(mseThrpt?.toExponential(3))) },
     { title: "Throughput R²", value: r2Thrpt?.toFixed(3) },
   ];
 
