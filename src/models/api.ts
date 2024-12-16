@@ -60,7 +60,7 @@ export interface AnalysisInfoRequestData {
   startTime: string;
   endTime: string;
   nfTypes?: string[] | null;
-  nfInstances?: string[] | null;
+  nfInstanceIds?: string[] | null;
   accuracy?: string;
 }
 

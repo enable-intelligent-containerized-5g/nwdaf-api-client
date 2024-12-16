@@ -39,7 +39,7 @@ const schema = yup.object().shape({
   analysisMetrics: yup.string().required("This field is required"),
   typeInfoFilter: yup.string().required("This field is required"),
   nfTypes: yup.array().of(yup.string()).notRequired(),
-  nfInstances: yup.array().of(yup.string()).notRequired(),
+  nfInstanceIds: yup.array().of(yup.string()).notRequired(),
   analysisTime: yup.string().required("This field is required"),
   defaultTime: yup
     .number()
@@ -84,7 +84,7 @@ const AnalyticsInfoView = () => {
       analysisMetrics,
       typeInfoFilter,
       nfTypes,
-      nfInstances,
+      nfInstanceIds,
       analysisTime,
       defaultTime,
       accuracy,
@@ -107,14 +107,14 @@ const AnalyticsInfoView = () => {
       endTime = valueTimeFormatted;
     }
 
-    // Aseguramos que nfTypes y nfInstances sean siempre un arreglo de strings
+    // Aseguramos que nfTypes y nfInstanceIds sean siempre un arreglo de strings
     const validNfTypes = nfTypes
       ? nfTypes.filter((type): type is string => type !== undefined)
       : [];
-    const validNfInstances = nfInstances
-      ? nfInstances.filter(
-          (instance): instance is string => instance !== undefined,
-        )
+    const validNfInstances = nfInstanceIds
+      ? nfInstanceIds.filter(
+          (instance): instance is string => !!instance,
+        ).map(instance => instance.trim())
       : [];
 
     const analysisInfoRequestData: AnalysisInfoRequestData = {
@@ -126,7 +126,7 @@ const AnalyticsInfoView = () => {
         ? { nfTypes: validNfTypes }
         : {}),
       ...(typeInfoFilter === "nfInstanceId" && validNfInstances.length > 0
-        ? { nfInstances: validNfInstances }
+        ? { nfInstanceIds: validNfInstances }
         : {}),
     };
 
@@ -198,11 +198,11 @@ const AnalyticsInfoView = () => {
                               .min(1, "NF Types is required")
                               .required("NF Types is required"),
                           });
-                          setValue("nfInstances", []);
+                          setValue("nfInstanceIds", []);
                         }
                         if (value === "nfInstanceId") {
                           newSchema = schema.shape({
-                            nfInstances: yup
+                            nfInstanceIds: yup
                               .array()
                               .of(yup.string())
                               .min(1, "NF Instances is required")
@@ -257,19 +257,19 @@ const AnalyticsInfoView = () => {
                 {typeInfoFilterValue === "nfInstanceId" && (
                   <Item
                     label="NF Instances"
-                    validateStatus={errors.nfInstances ? "error" : ""}
-                    help={errors.nfInstances?.message}
+                    validateStatus={errors.nfInstanceIds ? "error" : ""}
+                    help={errors.nfInstanceIds?.message}
                   >
                     <Controller
-                      name="nfInstances"
+                      name="nfInstanceIds"
                       control={control}
                       render={({ field }) => {
                         const handleChange = (
                           e: ChangeEvent<HTMLTextAreaElement>,
                         ) => {
                           const value = e.target.value;
-                          const nfInstances = value.split(",");
-                          field.onChange(nfInstances);
+                          const nfInstanceIds = value.split(",");
+                          field.onChange(nfInstanceIds);
                         };
                         return (
                           <TextArea
@@ -468,7 +468,7 @@ interface AnalysisMetricsForm {
   analysisMetrics: string;
   typeInfoFilter: string;
   nfTypes: string[];
-  nfInstances: string[];
+  nfInstanceIds: string[];
   analysisTime: string;
   defaultTime: number;
   startTime: string;
